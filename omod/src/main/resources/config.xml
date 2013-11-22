@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module configVersion="1.2">
+	<id>${project.parent.artifactId}</id>
+	<name>${project.parent.name}</name>
+	<version>${project.parent.version}</version>
+	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
+	<author>I-TECH</author>
+	<description>${project.parent.description}</description>
+	<updateURL>https://dev.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
+	<require_version>${openMRSVersion}</require_version>
+
+	<require_modules>
+		<require_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</require_module>
+	</require_modules>
+
+	<activator>${project.parent.groupId}.${project.parent.artifactId}.MetadataDeployActivator</activator>
+
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+</module>
