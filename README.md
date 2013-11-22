@@ -20,12 +20,18 @@ bundles first. A simple of example of a bundle looks like:
 			public static final String FORM_TYPE2 = "89994550-9939-40f3-afa6-173bce445c79";
 		}
 
+		public static final class _Package {
+			public static final String LOCATIONS = "5856a8fc-7ebc-46e8-929c-5ae2c780ab54";
+		}
+
 		@Override
 		public void install() {
 			install(encounterType("Encounter Type #1", "Something...", _EncounterType.ENCOUNTER_TYPE1));
 
 			install(form("Form #1", null, _EncounterType.ENCOUNTER_TYPE1, "1", _Form.FORM_TYPE1));
 			install(form("Form #2", null, _EncounterType.ENCOUNTER_TYPE1, "1", _Form.FORM_TYPE2));
+
+			install(packageFile("locations-1.zip", null, _Package.LOCATIONS));
 		}
 	}
 
