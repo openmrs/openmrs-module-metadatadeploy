@@ -25,6 +25,7 @@ import org.openmrs.Privilege;
 import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.SerializingCustomDatatype;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
@@ -93,6 +94,35 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		bundles.addAll(Arrays.asList(testBundle1, new TestBundle4()));
 
 		deployService.installBundles(bundles);
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
+	 */
+	@Test
+	public void installPackage_shouldInstallPackagesOnlyIfNecessary() throws Exception {
+
+		// Test package contains visit type { name: "Outpatient", uuid: "3371a4d4-f66f-4454-a86d-92c7b3da990c" }
+		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
+		final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
+
+		try {
+			// Check data isn't there
+			MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c");
+			Assert.fail();
+		}
+		catch (IllegalArgumentException ex) {
+		}
+
+		ClassLoader classLoader = this.getClass().getClassLoader();
+
+		// Simulate first time startup
+		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(true));
+		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+
+		// Simulate starting a second time
+		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(false));
+		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
 	}
 
 	/**

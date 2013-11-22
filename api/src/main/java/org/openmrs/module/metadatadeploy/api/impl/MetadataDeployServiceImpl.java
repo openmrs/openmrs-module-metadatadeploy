@@ -14,8 +14,11 @@
 
 package org.openmrs.module.metadatadeploy.api.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.annotation.Handler;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
@@ -23,18 +26,29 @@ import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
 import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.openmrs.module.metadatadeploy.handler.ObjectMergeHandler;
+import org.openmrs.module.metadatasharing.ImportConfig;
+import org.openmrs.module.metadatasharing.ImportMode;
+import org.openmrs.module.metadatasharing.ImportedPackage;
+import org.openmrs.module.metadatasharing.MetadataSharing;
+import org.openmrs.module.metadatasharing.api.MetadataSharingService;
+import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of the metadata deploy service
  */
 public class MetadataDeployServiceImpl extends BaseOpenmrsService implements MetadataDeployService {
+
+	protected static final Log log = LogFactory.getLog(MetadataDeployServiceImpl.class);
 
 	private Map<Class<?>, ObjectDeployHandler> handlers;
 
@@ -104,6 +118,42 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		installed.add(bundle);
 
 		Context.flushSession();
+	}
+
+	/**
+	 * @see MetadataDeployService#installPackage(String, ClassLoader, String)
+	 */
+	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException {
+		try {
+			Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(filename);
+			if (!matcher.matches()) {
+				throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
+			}
+
+			Integer version = Integer.valueOf(matcher.group(1));
+
+			ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(groupUuid);
+			if (installed != null && installed.getVersion() >= version) {
+				log.info("Metadata package " + filename + " is already installed with version " + installed.getVersion());
+				return false;
+			}
+
+			if (loader.getResource(filename) == null) {
+				throw new RuntimeException("Cannot find " + filename + " for group " + groupUuid);
+			}
+
+			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
+			metadataImporter.setImportConfig(ImportConfig.valueOf(ImportMode.MIRROR));
+			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
+			metadataImporter.importPackage();
+
+			log.debug("Loaded metadata package '" + filename + "'");
+
+			return true;
+
+		} catch (Exception ex) {
+			throw new RuntimeException("Failed to install metadata package " + filename, ex);
+		}
 	}
 
 	/**

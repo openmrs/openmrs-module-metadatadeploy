@@ -302,6 +302,17 @@ public class CoreConstructors {
 	}
 
 	/**
+	 * Constructs a package descriptor
+	 * @param filename the name
+	 * @param classLoader the description
+	 * @param groupUuid the group UUID
+	 * @return the visit type
+	 */
+	public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid) {
+		return new PackageDescriptor(filename, classLoader, groupUuid);
+	}
+
+	/**
 	 * Convenience method to construct a set of identifiers
 	 * @param identifiers the identifiers
 	 * @return the set of identifiers

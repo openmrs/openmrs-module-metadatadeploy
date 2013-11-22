@@ -15,6 +15,7 @@
 package org.openmrs.module.metadatadeploy.api;
 
 import org.openmrs.OpenmrsObject;
+import org.openmrs.api.APIException;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,15 @@ public interface MetadataDeployService {
 	 * @param bundles the bundles
 	 */
 	public void installBundles(Collection<MetadataBundle> bundles);
+
+	/**
+	 * Installs a MDS package if it has not been installed yet or the installed version is out of date
+	 * @param filename the package filename
+	 * @param loader the class loader to use for loading the package
+	 * @param groupUuid the package group UUID
+	 * @return whether package was installed
+	 */
+	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException;
 
 	/**
 	 * Installs the incoming object
@@ -51,5 +61,6 @@ public interface MetadataDeployService {
 	 * @param clazz the object's class
 	 * @param uuid the object's UUID
 	 */
+	@Transactional(readOnly = true)
 	<T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid);
 }

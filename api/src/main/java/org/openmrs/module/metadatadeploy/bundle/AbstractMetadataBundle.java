@@ -27,6 +27,17 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	protected MetadataDeployService deployService;
 
 	/**
+	 * Installs the given metadata package
+	 * @param pkg the incoming package
+	 * @return the installed object
+	 */
+	protected void install(PackageDescriptor pkg) {
+		ClassLoader loader = pkg.getClassLoader() != null ? pkg.getClassLoader() : this.getClass().getClassLoader();
+
+		deployService.installPackage(pkg.getFilename(), loader, pkg.getGroupUuid());
+	}
+
+	/**
 	 * Installs the given object
 	 * @param incoming the incoming object
 	 * @return the installed object
