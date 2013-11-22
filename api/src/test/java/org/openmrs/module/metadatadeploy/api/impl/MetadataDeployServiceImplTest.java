@@ -21,15 +21,24 @@ import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
+import org.openmrs.Privilege;
 import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.SerializingCustomDatatype;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
+import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
+import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
+import org.openmrs.module.metadatadeploy.bundle.Requires;
 import org.openmrs.module.metadatadeploy.handler.impl.ProgramDeployHandler;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
@@ -41,6 +50,50 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 
 	@Autowired
 	private MetadataDeployService deployService;
+
+	@Autowired
+	private TestBundle1 testBundle1;
+
+	@Autowired
+	private TestBundle2 testBundle2;
+
+	@Autowired
+	private TestBundle3 testBundle3;
+
+	/**
+	 * @see MetadataDeployServiceImpl#installBundles(java.util.Collection)
+	 */
+	@Test
+	public void installBundles() {
+		List<MetadataBundle> bundles = new ArrayList<MetadataBundle>();
+		bundles.addAll(Arrays.asList(testBundle3, testBundle2, testBundle1));
+
+		deployService.installBundles(bundles);
+
+		Privilege privilege1 = Context.getUserService().getPrivilege("Test Privilege 1");
+		Privilege privilege2 = Context.getUserService().getPrivilege("Test Privilege 2");
+
+		Assert.assertThat(privilege1, is(notNullValue()));
+		Assert.assertThat(privilege2, is(notNullValue()));
+		Assert.assertThat(Context.getUserService().getRole("Test Role 1"), is(notNullValue()));
+		Assert.assertThat(Context.getUserService().getRole("Test Role 2"), is(notNullValue()));
+		//Assert.assertThat(Context.getUserService().getRole("Test Role 2").getPrivileges(), contains(privilege1, privilege2));
+
+		Assert.assertThat(Context.getEncounterService().getEncounterTypeByUuid(uuid("enc-type-uuid")), is(notNullValue()));
+		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form1-uuid")), is(notNullValue()));
+		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form2-uuid")), is(notNullValue()));
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#installBundles(java.util.Collection)
+	 */
+	@Test(expected = RuntimeException.class)
+	public void installBundles_shouldThrowExceptionIfFindBrokenRequirement() {
+		List<MetadataBundle> bundles = new ArrayList<MetadataBundle>();
+		bundles.addAll(Arrays.asList(testBundle1, new TestBundle4()));
+
+		deployService.installBundles(bundles);
+	}
 
 	/**
 	 * @see MetadataDeployServiceImpl#installObject(org.openmrs.OpenmrsObject)
@@ -230,6 +283,64 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		public EncounterType deserialize(String serializedValue) {
 			return StringUtils.isNotEmpty(serializedValue) ? Context.getEncounterService().getEncounterType(Integer.valueOf(serializedValue)) : null;
 		}
+	}
+
+	@Component
+	public static class TestBundle1 extends AbstractMetadataBundle {
+		@Override
+		public void install() {
+			install(privilege("Test Privilege 1", "Testing"));
+
+			install(role("Test Role 1", "Testing", null, idSet("Test Privilege 1")));
+			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), null));
+
+			install(encounterType("Test Encounter", "Testing", uuid("enc-type-uuid")));
+		}
+	}
+
+	@Component
+	@Requires({ TestBundle1.class })
+	public static class TestBundle2 extends AbstractMetadataBundle {
+		@Override
+		public void install() {
+			install(privilege("Test Privilege 1", "New description"));
+			install(privilege("Test Privilege 2", "Testing"));
+
+			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), idSet("Test Privilege 1", "Test Privilege 2")));
+
+			install(form("Test Form #1", "Testing", uuid("enc-type-uuid"), "1", uuid("form1-uuid")));
+		}
+	}
+
+	@Component
+	@Requires({ TestBundle1.class })
+	public static class TestBundle3 extends AbstractMetadataBundle {
+		@Override
+		public void install() {
+			install(form("Test Form #2", "Testing", uuid("enc-type-uuid"), "1", uuid("form2-uuid")));
+		}
+	}
+
+	/**
+	 * Has broken requirement because TestBundle5 isn't instantiated as a component
+	 */
+	@Requires({ TestBundle5.class })
+	public static class TestBundle4 extends AbstractMetadataBundle {
+		@Override
+		public void install() { }
+	}
+
+	public static class TestBundle5 extends AbstractMetadataBundle {
+		@Override
+		public void install() { }
+	}
+
+	/**
+	 * Converts a simple identifier to a valid UUID (at least by our standards)
+	 * @return the UUID
+	 */
+	protected static String uuid(String name) {
+		return StringUtils.rightPad(name, 36, 'x');
 	}
 
 	/**
