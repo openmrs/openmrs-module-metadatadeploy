@@ -24,7 +24,7 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>org.openmrs.module.kenyacore.metadata.api.MetadataDeployService</value>
+				<value>org.openmrs.module.metadatadeploy.api.MetadataDeployService</value>
 				<ref local="metadataDeployService"/>
 			</list>
 		</property>
