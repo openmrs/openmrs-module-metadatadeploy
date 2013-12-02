@@ -60,7 +60,7 @@ MetadataDeployService svc = Context.getService(MetadataDeployService.class);
 svc.installBundles(Context.getRegisteredComponents(MetadataBundle.class));
 ```
 
-Or used on it's own in a unit test:
+Or used on its own in a unit test:
 
 ```java
 @Autowired
