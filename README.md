@@ -6,7 +6,8 @@ Overview
 This module provides a simple framework for deploying metadata. It enables the same metadata definitions to be easily and quickly deployed at both runtime and test-time. 
 
  * Guarantees consistency of metadata across installations. Distributions can know that the metadata they require is always present on start up, and is exactly as they expect it.
- * Provides mechanism for saving metadata objects which is significantly faster than loading metadata packages, and thus suitable for inclusion in unit tests.
+ * Provides a mechanism for installing metadata objects which is significantly faster than loading metadata packages, and thus suitable for inclusion in unit tests.
+ * Provides a mechanism for uninstalling metadata objects if they are no longer desired.
  * Allows complete visibility of the metadata (i.e. nothing hidden in zip files or liquibase changesets).
  * Encourages a readable name-spaced pattern for identifying metadata objects, e.g. `TbMetadata._Form.TB_ENROLLMENT`.
 
@@ -45,6 +46,9 @@ public class MyMetadata extends AbstractMetadataBundle {
 		install(form("Form #2", null, _EncounterType.ENCOUNTER_TYPE1, "1", _Form.FORM_TYPE2));
 
 		install(packageFile("locations-1.zip", null, _Package.LOCATIONS));
+		
+		// A form that should be retired if it exists
+		uninstall(existing(Form.class, "73d34479-2f9e-4de3-a5e6-1f79a17459bb"), "Because...")
 	}
 }
 ```
