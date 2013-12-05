@@ -53,7 +53,7 @@ public class RelationshipTypeDeployHandler implements ObjectDeployHandler<Relati
 	 */
 	@Override
 	public RelationshipType findAlternateMatch(RelationshipType incoming) {
-		return personService.getRelationshipTypeByName(incoming.getName());
+		return null;
 	}
 
 	/**
