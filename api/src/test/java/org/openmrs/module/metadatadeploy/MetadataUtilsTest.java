@@ -18,12 +18,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.ConceptNumeric;
+import org.openmrs.Drug;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
+import org.openmrs.Privilege;
 import org.openmrs.Program;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
@@ -93,6 +95,23 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void getConcept_shouldThrowExceptionForNumericConceptWithNoConceptNumeric() {
 		MetadataUtils.getConcept("11716f9c-1434-4f8d-b9fc-9aa14c4d6129");
+	}
+
+	/**
+	 * @see MetadataUtils#getDrug(String)
+	 */
+	@Test
+	public void getDrug_shouldFetchByUuid() {
+		Drug aspirin = Context.getConceptService().getDrug(3);
+		Assert.assertThat(MetadataUtils.getDrug("05ec820a-d297-44e3-be6e-698531d9dd3f"), is(aspirin));
+	}
+
+	/**
+	 * @see MetadataUtils#getDrug(String)
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void getDrug_shouldThrowExceptionForNonExistentUuid() {
+		MetadataUtils.getDrug(NONEXISTENT_UUID);
 	}
 
 	/**
@@ -203,6 +222,28 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void getPersonAttributeType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getPersonAttributeType(NONEXISTENT_UUID);
+	}
+
+	/**
+	 * @see MetadataUtils#getPrivilege(String)
+	 */
+	@Test
+	public void getPrivilege_shouldFetchByPrivilegeOrUuid() {
+		final String VIEW_TESTS = "51569FBC-2D55-4E83-8800-104652D17CD5";
+		Privilege viewTests = new Privilege("View Tests", "desc");
+		viewTests.setUuid(VIEW_TESTS);
+		Context.getUserService().savePrivilege(viewTests);
+
+		Assert.assertThat(MetadataUtils.getPrivilege("View Tests"), is(viewTests));
+		Assert.assertThat(MetadataUtils.getPrivilege(VIEW_TESTS), is(viewTests));
+	}
+
+	/**
+	 * @see MetadataUtils#getPrivilege(String)
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void getPrivilege_shouldThrowExceptionForNonExistent() {
+		MetadataUtils.getPrivilege(NONEXISTENT_UUID);
 	}
 
 	/**

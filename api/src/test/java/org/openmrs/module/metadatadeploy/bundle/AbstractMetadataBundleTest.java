@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Form;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,22 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
 	private TestBundle testBundle;
+
+	/**
+	 * @see AbstractMetadataBundle#install(PackageDescriptor)
+	 */
+	@Test
+	public void install_package() {
+		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
+		final ClassLoader loader = getClass().getClassLoader();
+		final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
+
+		PackageDescriptor pkg1 = new PackageDescriptor(TEST_PACKAGE_FILENAME, loader, TEST_PACKAGE_GROUP_UUID);
+		testBundle.install(pkg1);
+
+		// Check contained visit type was installed
+		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+	}
 
 	/**
 	 * @see AbstractMetadataBundle#existing(Class, String)
@@ -78,7 +95,6 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	public static class TestBundle extends AbstractMetadataBundle {
 		@Override
 		public void install() {
-			//To change body of implemented methods use File | Settings | File Templates.
 		}
 	}
 }
