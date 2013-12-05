@@ -17,7 +17,10 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,7 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		final String HIV_PROGRAM_UUID = "0a9afe04-088b-44ca-9291-0a8c3b5c96fa";
 		final String MALARIA_PROGRAM_UUID = "f923524a-b90c-4870-a948-4125638606fd";
 
-		// Check creating new
+		// Check installing new
 		deployService.installObject(program("Test Program", "Testing", HIV_PROGRAM_UUID, "obj1-uuid"));
 
 		Program created = Context.getProgramWorkflowService().getProgramByUuid("obj1-uuid");
@@ -67,5 +70,33 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 		Program old = Context.getProgramWorkflowService().getProgramByUuid("obj1-uuid");
 		Assert.assertThat(old, is(nullValue()));
+
+		// Add some workflows and states to check our custom retire works
+		ProgramWorkflowState state = new ProgramWorkflowState();
+		state.setName("State");
+		state.setConcept(MetadataUtils.getConcept("e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
+		state.setInitial(true);
+		state.setTerminal(false);
+		ProgramWorkflow workflow = new ProgramWorkflow();
+		workflow.setName("Workflow");
+		workflow.setConcept(MetadataUtils.getConcept("e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
+		workflow.addState(state);
+		updated.addWorkflow(workflow);
+
+		// Check uninstall retires
+		deployService.uninstallObject(deployService.fetchObject(Program.class, "obj2-uuid"), "Testing");
+
+		Assert.assertThat(Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid").isRetired(), is(true));
+
+		// Check re-install unretires
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_UUID, "obj2-uuid"));
+
+		Program unretired = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		Assert.assertThat(unretired.getName(), is("Unretired name"));
+		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));
+		Assert.assertThat(unretired.isRetired(), is(false));
+		Assert.assertThat(unretired.getDateRetired(), nullValue());
+		Assert.assertThat(unretired.getRetiredBy(), nullValue());
+		Assert.assertThat(unretired.getRetireReason(), nullValue());
 	}
 }

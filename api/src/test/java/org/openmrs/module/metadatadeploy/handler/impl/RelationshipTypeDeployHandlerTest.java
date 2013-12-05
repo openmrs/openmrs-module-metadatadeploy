@@ -14,7 +14,6 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.RelationshipType;
@@ -35,39 +34,39 @@ public class RelationshipTypeDeployHandlerTest extends BaseModuleContextSensitiv
 	@Autowired
 	private MetadataDeployService deployService;
 
-	/**
-	 * Tests use of handler for installation
-	 */
 	@Test
-	public void intergration() {
-		//check creating new
-		deployService.installObject(relationshipType("Spouse", "Spouse", "a husband and a wife", "relationship-type-uuid"));
+	public void integration() {
+		// Check installing new
+		deployService.installObject(relationshipType("New AtoB", "New BtoA", "New desc", "obj-uuid"));
 
-		RelationshipType created = Context.getPersonService().getRelationshipTypeByUuid("relationship-type-uuid");
-		Assert.assertThat(created.getaIsToB(), is("Spouse"));
-		Assert.assertThat(created.getbIsToA(), is("Spouse"));
-		Assert.assertThat(created.getDescription(), is("a husband and a wife"));
+		RelationshipType created = Context.getPersonService().getRelationshipTypeByUuid("obj-uuid");
+		Assert.assertThat(created.getaIsToB(), is("New AtoB"));
+		Assert.assertThat(created.getbIsToA(), is("New BtoA"));
+		Assert.assertThat(created.getDescription(), is("New desc"));
 
 		// Check updating existing
-		deployService.installObject(relationshipType("Spouse new", "Spouse new", "a husband and a wife", "relationship-type-uuid"));
-		RelationshipType updated = Context.getPersonService().getRelationshipTypeByUuid("relationship-type-uuid");
-		Assert.assertThat(updated.getaIsToB(), is("Spouse new"));
-		Assert.assertThat(updated.getbIsToA(), is("Spouse new"));
-		Assert.assertThat(updated.getDescription(), is("a husband and a wife"));
+		deployService.installObject(relationshipType("Updated AtoB", "Updated BtoA", "Updated desc", "obj-uuid"));
 
-		// Retire object
-		Context.getPersonService().retireRelationshipType(updated, "Testing");
+		RelationshipType updated = Context.getPersonService().getRelationshipTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getaIsToB(), is("Updated AtoB"));
+		Assert.assertThat(updated.getbIsToA(), is("Updated BtoA"));
+		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 
-		// Check that re-install unretires
-		deployService.installObject(relationshipType("Unretired spouse", "Unretired spouse", "a husband and a wife", "relationship-type-uuid"));
+		// Check uninstall retires
+		deployService.uninstallObject(deployService.fetchObject(RelationshipType.class, "obj-uuid"), "Testing");
 
-		RelationshipType unretired = Context.getPersonService().getRelationshipTypeByUuid("relationship-type-uuid");
-		Assert.assertThat(unretired.getaIsToB(), is("Unretired spouse"));
-		Assert.assertThat(unretired.getbIsToA(), is("Unretired spouse"));
-		Assert.assertThat(unretired.getDescription(), is("a husband and a wife"));
+		Assert.assertThat(Context.getPersonService().getRelationshipTypeByUuid("obj-uuid").isRetired(), is(true));
+
+		// Check re-install unretires
+		deployService.installObject(relationshipType("Unretired AtoB", "Unretired BtoA", "Unretired desc", "obj-uuid"));
+
+		RelationshipType unretired = Context.getPersonService().getRelationshipTypeByUuid("obj-uuid");
+		Assert.assertThat(unretired.getaIsToB(), is("Unretired AtoB"));
+		Assert.assertThat(unretired.getbIsToA(), is("Unretired BtoA"));
+		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));
 		Assert.assertThat(unretired.isRetired(), is(false));
-		Assert.assertThat(unretired.getDateRetired(), is(nullValue()));
-		Assert.assertThat(unretired.getRetiredBy(), is(nullValue()));
-		Assert.assertThat(unretired.getRetireReason(), is(nullValue()));
+		Assert.assertThat(unretired.getDateRetired(), nullValue());
+		Assert.assertThat(unretired.getRetiredBy(), nullValue());
+		Assert.assertThat(unretired.getRetireReason(), nullValue());
 	}
 }

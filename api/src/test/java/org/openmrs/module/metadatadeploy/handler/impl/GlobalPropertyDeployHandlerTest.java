@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.SerializingCustomDatatype;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounterType;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
 
 /**
@@ -43,7 +45,7 @@ public class GlobalPropertyDeployHandlerTest extends BaseModuleContextSensitiveT
 	 */
 	@Test
 	public void integration() {
-		// Check creating new
+		// Check installing new
 		deployService.installObject(globalProperty("test.property", "Testing", "Value"));
 
 		GlobalProperty created = Context.getAdministrationService().getGlobalPropertyObject("test.property");
@@ -96,6 +98,18 @@ public class GlobalPropertyDeployHandlerTest extends BaseModuleContextSensitiveT
 		custom = Context.getAdministrationService().getGlobalPropertyObject("test.property2");
 		Assert.assertThat(custom.getDatatypeClassname(), is(TestingDatatype.class.getName()));
 		Assert.assertThat(custom.getValue(), is((Object) encType));
+
+		// Check uninstall deletes
+		deployService.uninstallObject(deployService.fetchObject(GlobalProperty.class, "test.property"), "Testing");
+
+		Assert.assertThat(Context.getAdministrationService().getGlobalPropertyObject("test.property"), nullValue());
+
+		// Check re-install creates new
+		deployService.installObject(globalProperty("test.property", "Unretired desc", "Unretired value"));
+
+		GlobalProperty unretired = Context.getAdministrationService().getGlobalPropertyObject("test.property");
+		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));
+		Assert.assertThat(unretired.getPropertyValue(), is("Unretired value"));
 	}
 
 	/**

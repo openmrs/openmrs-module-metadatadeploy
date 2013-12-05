@@ -158,6 +158,18 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
+	 * @see CoreConstructors#packageFile(String, ClassLoader, String)
+	 */
+	@Test
+	public void packageFile() {
+		PackageDescriptor obj = CoreConstructors.packageFile("xxx.zip", getClass().getClassLoader(), "obj-uuid");
+
+		Assert.assertThat(obj.getFilename(), is("xxx.zip"));
+		Assert.assertThat(obj.getClassLoader(), is(getClass().getClassLoader()));
+		Assert.assertThat(obj.getGroupUuid(), is("obj-uuid"));
+	}
+
+	/**
 	 * @see CoreConstructors#patientIdentifierType(String, String, String, String, Class, org.openmrs.PatientIdentifierType.LocationBehavior, boolean, String)
 	 */
 	@Test

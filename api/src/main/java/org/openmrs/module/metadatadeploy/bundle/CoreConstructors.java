@@ -141,6 +141,17 @@ public class CoreConstructors {
 	}
 
 	/**
+	 * Constructs a package descriptor
+	 * @param filename the name
+	 * @param classLoader the description
+	 * @param groupUuid the group UUID
+	 * @return the visit type
+	 */
+	public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid) {
+		return new PackageDescriptor(filename, classLoader, groupUuid);
+	}
+
+	/**
 	 * Constructs a patient identifier type
 	 * @param name the name
 	 * @param description the description
@@ -300,17 +311,6 @@ public class CoreConstructors {
 		obj.setDescription(description);
 		obj.setUuid(uuid);
 		return obj;
-	}
-
-	/**
-	 * Constructs a package descriptor
-	 * @param filename the name
-	 * @param classLoader the description
-	 * @param groupUuid the group UUID
-	 * @return the visit type
-	 */
-	public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid) {
-		return new PackageDescriptor(filename, classLoader, groupUuid);
 	}
 
 	/**

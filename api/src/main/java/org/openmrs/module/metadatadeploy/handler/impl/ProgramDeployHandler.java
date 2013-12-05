@@ -15,11 +15,16 @@
 package org.openmrs.module.metadatadeploy.handler.impl;
 
 import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ProgramWorkflowService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.Date;
 
 /**
  * Deployment handler for programs
@@ -75,6 +80,19 @@ public class ProgramDeployHandler implements ObjectDeployHandler<Program> {
 	 */
 	@Override
 	public void remove(Program obj, String reason) {
-		programService.retireProgram(obj);
+		// Because of TRUNK-4160, we can't just call retireProgram
+		obj.setRetired(true);
+		obj.setRetiredBy(Context.getAuthenticatedUser());
+		obj.setRetireReason(reason);
+		obj.setDateRetired(new Date());
+
+		for (ProgramWorkflow workflow : obj.getWorkflows()) {
+			workflow.setRetired(true);
+			for (ProgramWorkflowState state : workflow.getStates()) {
+				state.setRetired(true);
+			}
+		}
+
+		programService.saveProgram(obj);
 	}
 }

@@ -17,6 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -39,26 +40,29 @@ public class EncounterTypeDeployHandlerTest extends BaseModuleContextSensitiveTe
 	 */
 	@Test
 	public void integration() {
-		deployService.installObject(encounterType("Test Encounter", "Testing", "obj1-uuid"));
+		// Check installing new
+		deployService.installObject(encounterType("New name", "New desc", "obj-uuid"));
 
-		EncounterType created = Context.getEncounterService().getEncounterTypeByUuid("obj1-uuid");
-		Assert.assertThat(created.getName(), is("Test Encounter"));
-		Assert.assertThat(created.getDescription(), is("Testing"));
+		EncounterType created = Context.getEncounterService().getEncounterTypeByUuid("obj-uuid");
+		Assert.assertThat(created.getName(), is("New name"));
+		Assert.assertThat(created.getDescription(), is("New desc"));
 
 		// Check updating existing
-		deployService.installObject(encounterType("New name", "New desc", "obj1-uuid"));
+		deployService.installObject(encounterType("Updated name", "Updated desc", "obj-uuid"));
 
-		EncounterType updated = Context.getEncounterService().getEncounterTypeByUuid("obj1-uuid");
-		Assert.assertThat(updated.getName(), is("New name"));
-		Assert.assertThat(updated.getDescription(), is("New desc"));
+		EncounterType updated = Context.getEncounterService().getEncounterTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getName(), is("Updated name"));
+		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 
-		// Retire object
-		Context.getEncounterService().retireEncounterType(updated, "Testing");
+		// Check uninstall retires
+		deployService.uninstallObject(deployService.fetchObject(EncounterType.class, "obj-uuid"), "Testing");
 
-		// Check that re-install unretires
-		deployService.installObject(encounterType("Unretired name", "Unretired desc", "obj1-uuid"));
+		Assert.assertThat(Context.getEncounterService().getEncounterTypeByUuid("obj-uuid").isRetired(), is(true));
 
-		EncounterType unretired = Context.getEncounterService().getEncounterTypeByUuid("obj1-uuid");
+		// Check re-install unretires
+		deployService.installObject(encounterType("Unretired name", "Unretired desc", "obj-uuid"));
+
+		EncounterType unretired = Context.getEncounterService().getEncounterTypeByUuid("obj-uuid");
 		Assert.assertThat(unretired.getName(), is("Unretired name"));
 		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));
 		Assert.assertThat(unretired.isRetired(), is(false));
