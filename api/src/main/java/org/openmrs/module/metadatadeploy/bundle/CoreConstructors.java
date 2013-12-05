@@ -328,10 +328,10 @@ public class CoreConstructors {
 
 	/**
 	 * Construct a relationship type
-	 * @param aIsToB
-	 * @param bIsToA
-	 * @param description
-	 * @param uuid
+	 * @param aIsToB the A is to B
+	 * @param bIsToA the B is to A
+	 * @param description the description
+	 * @param uuid  the UUID
 	 * @return the relationship type
 	 */
 	public static RelationshipType relationshipType(String aIsToB, String bIsToA, String description, String uuid) {
