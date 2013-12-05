@@ -333,7 +333,7 @@ public class CoreConstructors {
 	 * @param description
 	 * @param uuid
 	 */
-	public RelationshipType relationshipType(String aIsToB, String bIsToA, String description,  String uuid) {
+	public static RelationshipType relationshipType(String aIsToB, String bIsToA, String description, String uuid) {
 		RelationshipType relationshipType = new RelationshipType();
 		relationshipType.setaIsToB(aIsToB);
 		relationshipType.setbIsToA(bIsToA);
