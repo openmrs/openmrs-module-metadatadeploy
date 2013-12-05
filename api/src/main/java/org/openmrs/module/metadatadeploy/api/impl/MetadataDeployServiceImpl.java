@@ -124,31 +124,30 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#installPackage(String, ClassLoader, String)
 	 */
 	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException {
+		Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(filename);
+		if (!matcher.matches()) {
+			throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
+		}
+
+		Integer version = Integer.valueOf(matcher.group(1));
+
+		ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(groupUuid);
+		if (installed != null && installed.getVersion() >= version) {
+			log.info("Metadata package " + filename + " is already installed with version " + installed.getVersion());
+			return false;
+		}
+
+		if (loader.getResource(filename) == null) {
+			throw new RuntimeException("Cannot find " + filename + " for group " + groupUuid);
+		}
+
 		try {
-			Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(filename);
-			if (!matcher.matches()) {
-				throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
-			}
-
-			Integer version = Integer.valueOf(matcher.group(1));
-
-			ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(groupUuid);
-			if (installed != null && installed.getVersion() >= version) {
-				log.info("Metadata package " + filename + " is already installed with version " + installed.getVersion());
-				return false;
-			}
-
-			if (loader.getResource(filename) == null) {
-				throw new RuntimeException("Cannot find " + filename + " for group " + groupUuid);
-			}
-
 			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
 			metadataImporter.setImportConfig(ImportConfig.valueOf(ImportMode.MIRROR));
 			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
 			metadataImporter.importPackage();
 
 			log.debug("Loaded metadata package '" + filename + "'");
-
 			return true;
 
 		} catch (Exception ex) {

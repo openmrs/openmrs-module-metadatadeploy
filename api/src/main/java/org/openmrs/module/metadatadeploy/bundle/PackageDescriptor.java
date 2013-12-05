@@ -46,14 +46,6 @@ public class PackageDescriptor {
 	}
 
 	/**
-	 * Sets the filename
-	 * @param filename the filename
-	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
-	/**
 	 * Gets the class loader
 	 * @return the class loader
 	 */
@@ -62,26 +54,10 @@ public class PackageDescriptor {
 	}
 
 	/**
-	 * Sets the class loader
-	 * @param classLoader the class loader
-	 */
-	public void setClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
-	}
-
-	/**
 	 * Gets the group UUID
 	 * @return the group UUID
 	 */
 	public String getGroupUuid() {
 		return groupUuid;
-	}
-
-	/**
-	 * Sets the group UUID
-	 * @param groupUuid the group UUID
-	 */
-	public void setGroupUuid(String groupUuid) {
-		this.groupUuid = groupUuid;
 	}
 }

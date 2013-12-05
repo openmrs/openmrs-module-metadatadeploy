@@ -110,7 +110,7 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		catch (IllegalArgumentException ex) {
 		}
 
-		ClassLoader classLoader = this.getClass().getClassLoader();
+		ClassLoader classLoader = getClass().getClassLoader();
 
 		// Simulate first time startup
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(true));
@@ -119,6 +119,36 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		// Simulate starting a second time
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(false));
 		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
+	 */
+	@Test(expected = RuntimeException.class)
+	public void installPackage_shouldThrowExceptionForInvalidFilename() throws Exception {
+		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
+
+		deployService.installPackage("xxx.zip", getClass().getClassLoader(), TEST_PACKAGE_GROUP_UUID);
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
+	 */
+	@Test(expected = RuntimeException.class)
+	public void installPackage_shouldThrowExceptionForNonExistentPackage() throws Exception {
+		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
+
+		deployService.installPackage("xxx-1.zip", getClass().getClassLoader(), TEST_PACKAGE_GROUP_UUID);
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
+	 */
+	@Test(expected = RuntimeException.class)
+	public void installPackage_shouldThrowExceptionForCorruptPackage() throws Exception {
+		final String TEST_CORRUPTPACKAGE_GROUP_UUID = "83E38E01-5ACA-4D64-8560-5D4587F62D4A";
+
+		deployService.installPackage("test-corruptpackage-1.zip", getClass().getClassLoader(), TEST_CORRUPTPACKAGE_GROUP_UUID);
 	}
 
 	/**
