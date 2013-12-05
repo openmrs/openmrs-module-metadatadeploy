@@ -24,6 +24,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.VisitType;
@@ -323,6 +324,23 @@ public class CoreConstructors {
 			set.add(identifier);
 		}
 		return set;
+	}
+
+	/**
+	 * Construct a relationship type
+	 * @param aIsToB the A is to B
+	 * @param bIsToA the B is to A
+	 * @param description the description
+	 * @param uuid  the UUID
+	 * @return the relationship type
+	 */
+	public static RelationshipType relationshipType(String aIsToB, String bIsToA, String description, String uuid) {
+		RelationshipType relationshipType = new RelationshipType();
+		relationshipType.setaIsToB(aIsToB);
+		relationshipType.setbIsToA(bIsToA);
+		relationshipType.setDescription(description);
+		relationshipType.setUuid(uuid);
+		return relationshipType;
 	}
 
 }
