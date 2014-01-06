@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
+import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -139,6 +140,18 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getPropertyValue(), is(""));
 		Assert.assertThat(obj.getValue(), is(nullValue()));
 		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+	}
+
+	/**
+	 * @see CoreConstructors#location(String, String, String)
+	 */
+	@Test
+	public void location() {
+		Location obj = CoreConstructors.location("name", "desc", "obj-uuid");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getDescription(), is("desc"));
+		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
 	}
 
 	/**

@@ -19,6 +19,7 @@ import org.apache.commons.collections.Transformer;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
+import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -114,6 +115,21 @@ public class CoreConstructors {
 			obj.setValue(value);
 		}
 
+		return obj;
+	}
+
+	/**
+	 * Constructs a location (with the minimum required fields)
+	 * @param name the name
+	 * @param description the description
+	 * @param uuid the UUID
+	 * @return the location
+	 */
+	public static Location location(String name, String description, String uuid) {
+		Location obj = new Location();
+		obj.setName(name);
+		obj.setDescription(description);
+		obj.setUuid(uuid);
 		return obj;
 	}
 
