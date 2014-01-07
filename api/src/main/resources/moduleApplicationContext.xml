@@ -13,9 +13,9 @@
 		<property name="target">
 			<bean class="org.openmrs.module.metadatadeploy.api.impl.MetadataDeployServiceImpl"/>
 		</property>
-		<property name="preInterceptors">
+		<!--<property name="preInterceptors"> These aren't relevant and slow things down
 			<ref bean="serviceInterceptors" />
-		</property>
+		</property>-->
 		<property name="transactionAttributeSource">
 			<ref bean="transactionAttributeSource" />
 		</property>
