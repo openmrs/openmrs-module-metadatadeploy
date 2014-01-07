@@ -17,9 +17,11 @@ package org.openmrs.module.metadatadeploy.api.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.Role;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
@@ -149,6 +151,28 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		final String TEST_CORRUPTPACKAGE_GROUP_UUID = "83E38E01-5ACA-4D64-8560-5D4587F62D4A";
 
 		deployService.installPackage("test-corruptpackage-1.zip", getClass().getClassLoader(), TEST_CORRUPTPACKAGE_GROUP_UUID);
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#fetchObject(Class, String)
+	 */
+	@Test
+	public void fetchObject_shouldFetchObjectByIdentifier() throws Exception {
+		Assert.assertThat(deployService.fetchObject(Role.class, "Anonymous"), is(Context.getUserService().getRole("Anonymous")));
+		Assert.assertThat(deployService.fetchObject(Program.class, "da4a0391-ba62-4fad-ad66-1e3722d16380"), is(Context.getProgramWorkflowService().getProgram(1)));
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#saveObject(org.openmrs.OpenmrsObject)
+	 */
+	@Test
+	public void saveObject_shouldSaveObject() throws Exception {
+		Location location = new Location();
+		location.setName("Test");
+
+		deployService.saveObject(location);
+
+		Assert.assertThat(location.getId(), notNullValue());
 	}
 
 	/**

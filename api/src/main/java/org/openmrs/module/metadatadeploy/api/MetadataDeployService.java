@@ -63,4 +63,11 @@ public interface MetadataDeployService {
 	 */
 	@Transactional(readOnly = true)
 	<T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid);
+
+	/**
+	 * Saves the given object
+	 * @param obj the object
+	 * @return the object
+	 */
+	<T extends OpenmrsObject> T saveObject(OpenmrsObject obj);
 }

@@ -34,7 +34,6 @@ import org.openmrs.module.metadatasharing.api.MetadataSharingService;
 import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -207,6 +206,15 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	public <T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid) {
 		ObjectDeployHandler handler = getHandler(clazz);
 		return (T) handler.fetch(uuid);
+	}
+
+	/**
+	 * @see MetadataDeployService#saveObject(org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public <T extends OpenmrsObject> T saveObject(OpenmrsObject obj) {
+		ObjectDeployHandler handler = getHandler(obj.getClass());
+		return (T) handler.save(obj);
 	}
 
 	/**
