@@ -29,12 +29,18 @@ public abstract class AbstractCsvResourceSource<T extends OpenmrsObject> impleme
 	private CSVReader reader;
 
 	/**
-	 * Constructs a new CSV source
-	 * @param csvFile the csv resource path
+	 * Constructs a new source
+	 * @param csvFile the resource file path
+	 * @param hasHeader true if file has a header row
 	 */
-	public AbstractCsvResourceSource(String csvFile) {
+	public AbstractCsvResourceSource(String csvFile, boolean hasHeader) throws Exception {
 		InputStream in = getClass().getClassLoader().getResourceAsStream(csvFile);
 		reader = new CSVReader(new InputStreamReader(in));
+
+		// Throw away first line if it's a header
+		if (hasHeader) {
+			reader.readNext();
+		}
 	}
 
 	/**

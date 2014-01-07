@@ -49,8 +49,8 @@ public class AbstractCsvResourceSourceTest {
 	 */
 	protected class TestCsvSource extends AbstractCsvResourceSource<Location> {
 
-		public TestCsvSource() {
-			super("test-location-source.csv");
+		public TestCsvSource() throws Exception {
+			super("test-location-source.csv", true);
 		}
 
 		@Override
