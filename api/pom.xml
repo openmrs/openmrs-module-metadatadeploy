@@ -63,6 +63,15 @@
 
 		<!-- End OpenMRS core -->
 
+		<!-- Begin external libraries -->
+
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+		</dependency>
+
+		<!-- End external libraries -->
+
 	</dependencies>
 
 	<build>
