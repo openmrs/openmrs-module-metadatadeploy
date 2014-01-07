@@ -18,6 +18,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Location;
 
+import java.io.IOException;
+
 import static org.hamcrest.Matchers.*;
 
 /**
@@ -49,7 +51,7 @@ public class AbstractCsvResourceSourceTest {
 	 */
 	protected class TestCsvSource extends AbstractCsvResourceSource<Location> {
 
-		public TestCsvSource() throws Exception {
+		public TestCsvSource() throws IOException {
 			super("test-location-source.csv", true);
 		}
 
