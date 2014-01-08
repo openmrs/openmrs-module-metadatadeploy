@@ -15,6 +15,7 @@
 package org.openmrs.module.metadatadeploy.source;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.OpenmrsObject;
 
 import java.io.IOException;
@@ -54,6 +55,14 @@ public abstract class AbstractCsvResourceSource<T extends OpenmrsObject> impleme
 			close();
 			return null;
 		}
+
+		// Replace blank values with nulls
+		for (int c = 0; c < line.length; ++c) {
+			if (StringUtils.isBlank(line[c])) {
+				line[c] = null;
+			}
+		}
+
 		return parseLine(line);
 	}
 
