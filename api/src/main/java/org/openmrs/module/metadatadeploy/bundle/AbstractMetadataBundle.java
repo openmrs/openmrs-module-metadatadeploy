@@ -15,9 +15,11 @@
 package org.openmrs.module.metadatadeploy.bundle;
 
 import org.openmrs.OpenmrsObject;
-import org.openmrs.api.APIException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
+import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * Abstract base class for metadata bundle components
@@ -32,7 +34,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param pkg the incoming package
 	 * @return the installed object
 	 */
-	protected void install(PackageDescriptor pkg) throws APIException {
+	protected void install(PackageDescriptor pkg) {
 		ClassLoader loader = pkg.getClassLoader() != null ? pkg.getClassLoader() : this.getClass().getClassLoader();
 
 		deployService.installPackage(pkg.getFilename(), loader, pkg.getGroupUuid());
@@ -49,7 +51,16 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	}
 
 	/**
-	 * Uninstalls the given object
+	 * Installs all objects from the given source
+	 * @param source the object source
+	 * @return the installed objects
+	 */
+	protected <T extends OpenmrsObject> List<T> install(ObjectSource<T> source) {
+		return deployService.installFromSource(source);
+	}
+
+	/**
+	 * Uninstalls the given object. The object can be null in which case the method does nothing.
 	 * @param outgoing the outgoing object
 	 * @param reason the reason for uninstallation
 	 */

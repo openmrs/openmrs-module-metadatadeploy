@@ -26,6 +26,7 @@ import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
 import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.openmrs.module.metadatadeploy.handler.ObjectMergeHandler;
+import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatasharing.ImportConfig;
 import org.openmrs.module.metadatasharing.ImportMode;
 import org.openmrs.module.metadatasharing.ImportedPackage;
@@ -34,9 +35,11 @@ import org.openmrs.module.metadatasharing.api.MetadataSharingService;
 import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -192,6 +195,26 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		handler.save(incoming);
 
 		return existing != null;
+	}
+
+	/**
+	 * @see MetadataDeployService#installFromSource(org.openmrs.module.metadatadeploy.source.ObjectSource)
+	 */
+	@Override
+	public <T extends OpenmrsObject> List<T> installFromSource(ObjectSource<T> source) throws APIException {
+		List<T> installed = new ArrayList<T>();
+		T incoming;
+
+		try {
+			while ((incoming = source.fetchNext()) != null) {
+				installObject(incoming);
+				installed.add(incoming);
+			}
+			return installed;
+		}
+		catch (Exception ex) {
+			throw new APIException("Unable to install objects from " + source.getClass().getSimpleName());
+		}
 	}
 
 	/**

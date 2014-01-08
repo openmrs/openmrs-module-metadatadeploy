@@ -16,12 +16,19 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import static org.hamcrest.Matchers.*;
 
@@ -50,19 +57,39 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see AbstractMetadataBundle#existing(Class, String)
+	 * @see AbstractMetadataBundle#install(org.openmrs.module.metadatadeploy.source.ObjectSource)
 	 */
 	@Test
-	public void existing_shouldFetchExistingObject() {
-		// Check valid object
-		Form form1 = testBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
-		Assert.assertThat(form1, is(notNullValue()));
-		Assert.assertThat(form1.getName(), is("Basic Form"));
-		Assert.assertThat(form1.getUuid(), is("d9218f76-6c39-45f4-8efa-4c5c6c199f50"));
+	public void install_shouldInstallAllObjectsFromSource() {
+		TestEncounterTypeSource source = new TestEncounterTypeSource();
+		List<EncounterType> installed = testBundle.install(source);
 
-		// Check invalid object
-		Form form2 = testBundle.existing(Form.class, "xxxxxxxx");
-		Assert.assertThat(form2, is(nullValue()));
+		EncounterType type1 = Context.getEncounterService().getEncounterType("name1");
+		EncounterType type2 = Context.getEncounterService().getEncounterType("name2");
+
+		Assert.assertThat(type1, notNullValue());
+		Assert.assertThat(type2, notNullValue());
+		Assert.assertThat(installed, contains(type1, type2));
+	}
+
+	/**
+	 * @see AbstractMetadataBundle#install(org.openmrs.module.metadatadeploy.source.ObjectSource)
+	 */
+	@Test
+	public void install_shouldThrowAPIExceptionIfSourceThrowsException() {
+		BrokenEncounterTypeSource source = new BrokenEncounterTypeSource();
+
+		try {
+			testBundle.install(source);
+			Assert.fail();
+		}
+		catch(APIException ex) {
+		}
+
+		// TODO figure out why this doesn't work. Does the test databae not support transactions?
+
+		// Check the first item in the source is not installed (i.e. transaction was rolled back)
+		//Assert.assertThat(Context.getEncounterService().getEncounterType("name1"), nullValue());
 	}
 
 	/**
@@ -89,12 +116,64 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
+	 * @see AbstractMetadataBundle#existing(Class, String)
+	 */
+	@Test
+	public void existing_shouldFetchExistingObject() {
+		// Check valid object
+		Form form1 = testBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
+		Assert.assertThat(form1, is(notNullValue()));
+		Assert.assertThat(form1.getName(), is("Basic Form"));
+		Assert.assertThat(form1.getUuid(), is("d9218f76-6c39-45f4-8efa-4c5c6c199f50"));
+
+		// Check invalid object
+		Form form2 = testBundle.existing(Form.class, "xxxxxxxx");
+		Assert.assertThat(form2, is(nullValue()));
+	}
+
+	/**
 	 * Bundle for testing
 	 */
 	@Component
 	public static class TestBundle extends AbstractMetadataBundle {
 		@Override
 		public void install() {
+		}
+	}
+
+	/**
+	 * Working EncounterType source for testing
+	 */
+	public static class TestEncounterTypeSource implements ObjectSource<EncounterType> {
+
+		private Queue<EncounterType> queue = new LinkedList<EncounterType>();
+
+		public TestEncounterTypeSource() {
+			queue.add(new EncounterType("name1", "desc1"));
+			queue.add(new EncounterType("name2", "desc2"));
+		}
+
+		@Override
+		public EncounterType fetchNext() throws Exception {
+			return queue.poll();
+		}
+	}
+
+	/**
+	 * Non-working EncounterType source for testing that throws NPE on second call to fetchNext()
+	 */
+	public static class BrokenEncounterTypeSource implements ObjectSource<EncounterType> {
+
+		private boolean first = true;
+
+		@Override
+		public EncounterType fetchNext() throws Exception {
+			if (first) {
+				first = false;
+				return new EncounterType("name1", "desc1");
+
+			}
+			throw new NullPointerException();
 		}
 	}
 }

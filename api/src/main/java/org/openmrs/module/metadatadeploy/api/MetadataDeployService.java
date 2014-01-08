@@ -17,9 +17,11 @@ package org.openmrs.module.metadatadeploy.api;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.api.APIException;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
+import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Service for metadata deployment
@@ -30,8 +32,9 @@ public interface MetadataDeployService {
 	/**
 	 * Installs a collection of bundles
 	 * @param bundles the bundles
+	 * @throws APIException if an error occurs
 	 */
-	public void installBundles(Collection<MetadataBundle> bundles) throws APIException;
+	void installBundles(Collection<MetadataBundle> bundles) throws APIException;
 
 	/**
 	 * Installs a MDS package if it has not been installed yet or the installed version is out of date
@@ -39,8 +42,9 @@ public interface MetadataDeployService {
 	 * @param loader the class loader to use for loading the package
 	 * @param groupUuid the package group UUID
 	 * @return whether package was installed
+	 * @throws APIException if an error occurs
 	 */
-	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException;
+	boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException;
 
 	/**
 	 * Installs the incoming object
@@ -48,6 +52,15 @@ public interface MetadataDeployService {
 	 * @return true if an existing object was overwritten
 	 */
 	boolean installObject(OpenmrsObject incoming);
+
+	/**
+	 * Installs all objects from the given source
+	 * @param source the object source
+	 * @param <T> the object type
+	 * @return the list of installed objects
+	 * @throws APIException if an error occurs
+	 */
+	<T extends OpenmrsObject> List<T> installFromSource(ObjectSource<T> source) throws APIException;
 
 	/**
 	 * Uninstalls the given object
