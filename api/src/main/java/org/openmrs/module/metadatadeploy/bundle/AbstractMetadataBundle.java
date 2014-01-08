@@ -15,6 +15,7 @@
 package org.openmrs.module.metadatadeploy.bundle;
 
 import org.openmrs.OpenmrsObject;
+import org.openmrs.api.APIException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param pkg the incoming package
 	 * @return the installed object
 	 */
-	protected void install(PackageDescriptor pkg) {
+	protected void install(PackageDescriptor pkg) throws APIException {
 		ClassLoader loader = pkg.getClassLoader() != null ? pkg.getClassLoader() : this.getClass().getClassLoader();
 
 		deployService.installPackage(pkg.getFilename(), loader, pkg.getGroupUuid());

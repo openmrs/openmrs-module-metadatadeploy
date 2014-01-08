@@ -48,7 +48,7 @@ public abstract class AbstractCsvResourceSource<T extends OpenmrsObject> impleme
 	 * @see ObjectSource#fetchNext()
 	 */
 	@Override
-	public T fetchNext() throws IOException {
+	public T fetchNext() throws Exception {
 		String[] line = reader.readNext();
 		if (line == null) {
 			close();
@@ -62,7 +62,7 @@ public abstract class AbstractCsvResourceSource<T extends OpenmrsObject> impleme
 	 * @param line the line
 	 * @return the object
 	 */
-	protected abstract T parseLine(String[] line);
+	protected abstract T parseLine(String[] line) throws Exception;
 
 	/**
 	 * Closes the source

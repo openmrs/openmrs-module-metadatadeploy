@@ -73,7 +73,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#installBundles(java.util.Collection)
 	 */
 	@Override
-	public void installBundles(Collection<MetadataBundle> bundles) {
+	public void installBundles(Collection<MetadataBundle> bundles) throws APIException {
 		// Organize into map by class
 		Map<Class<? extends MetadataBundle>, MetadataBundle> all = new HashMap<Class<? extends MetadataBundle>, MetadataBundle>();
 		for (MetadataBundle bundle : bundles) {
@@ -93,30 +93,35 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @param all the map of all bundles and their ids
 	 * @param installed the set of previously installed bundles
 	 */
-	protected void installBundle(MetadataBundle bundle, Map<Class<? extends MetadataBundle>, MetadataBundle> all, Set<MetadataBundle> installed) {
+	protected void installBundle(MetadataBundle bundle, Map<Class<? extends MetadataBundle>, MetadataBundle> all, Set<MetadataBundle> installed) throws APIException {
 		// Return immediately if bundle has already been installed
 		if (installed.contains(bundle)) {
 			return;
 		}
 
-		// Install required bundles first
-		Requires requires = bundle.getClass().getAnnotation(Requires.class);
-		if (requires != null) {
-			for (Class<? extends MetadataBundle> requiredClass : requires.value()) {
-				MetadataBundle required = all.get(requiredClass);
+		try {
+			// Install required bundles first
+			Requires requires = bundle.getClass().getAnnotation(Requires.class);
+			if (requires != null) {
+				for (Class<? extends MetadataBundle> requiredClass : requires.value()) {
+					MetadataBundle required = all.get(requiredClass);
 
-				if (required == null) {
-					throw new RuntimeException("Can't find required bundle class " + requiredClass + " for " + bundle.getClass());
+					if (required == null) {
+						throw new RuntimeException("Can't find required bundle class " + requiredClass + " for " + bundle.getClass());
+					}
+
+					installBundle(required, all, installed);
 				}
-
-				installBundle(required, all, installed);
 			}
+
+			bundle.install();
+			installed.add(bundle);
+
+			Context.flushSession();
 		}
-
-		bundle.install();
-		installed.add(bundle);
-
-		Context.flushSession();
+		catch (Exception ex) {
+			throw new APIException("Unable to install bundle " + bundle.getClass().getSimpleName(), ex);
+		}
 	}
 
 	/**
@@ -125,7 +130,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException {
 		Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(filename);
 		if (!matcher.matches()) {
-			throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
+			throw new APIException("Filename must match PackageNameWithNoSpaces-X.zip");
 		}
 
 		Integer version = Integer.valueOf(matcher.group(1));
@@ -137,7 +142,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		}
 
 		if (loader.getResource(filename) == null) {
-			throw new RuntimeException("Cannot find " + filename + " for group " + groupUuid);
+			throw new APIException("Cannot load " + filename + " for group " + groupUuid);
 		}
 
 		try {
@@ -150,7 +155,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 			return true;
 
 		} catch (Exception ex) {
-			throw new RuntimeException("Failed to install metadata package " + filename, ex);
+			throw new APIException("Failed to install metadata package " + filename, ex);
 		}
 	}
 

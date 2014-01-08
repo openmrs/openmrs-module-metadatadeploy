@@ -22,6 +22,7 @@ import org.openmrs.Patient;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
 import org.openmrs.Role;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
@@ -35,9 +36,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
@@ -59,15 +58,15 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	@Autowired
 	private TestBundle3 testBundle3;
 
+	@Autowired
+	private TestBundle6 testBundle6;
+
 	/**
 	 * @see MetadataDeployServiceImpl#installBundles(java.util.Collection)
 	 */
 	@Test
 	public void installBundles() {
-		List<MetadataBundle> bundles = new ArrayList<MetadataBundle>();
-		bundles.addAll(Arrays.asList(testBundle3, testBundle2, testBundle1));
-
-		deployService.installBundles(bundles);
+		deployService.installBundles(Arrays.<MetadataBundle>asList(testBundle3, testBundle2, testBundle1));
 
 		Privilege privilege1 = Context.getUserService().getPrivilege("Test Privilege 1");
 		Privilege privilege2 = Context.getUserService().getPrivilege("Test Privilege 2");
@@ -86,12 +85,17 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	/**
 	 * @see MetadataDeployServiceImpl#installBundles(java.util.Collection)
 	 */
-	@Test(expected = RuntimeException.class)
-	public void installBundles_shouldThrowExceptionIfFindBrokenRequirement() {
-		List<MetadataBundle> bundles = new ArrayList<MetadataBundle>();
-		bundles.addAll(Arrays.asList(testBundle1, new TestBundle4()));
+	@Test(expected = APIException.class)
+	public void installBundles_shouldThrowAPIExceptionIfFindBrokenRequirement() {
+		deployService.installBundles(Arrays.<MetadataBundle>asList(testBundle1, new TestBundle4()));
+	}
 
-		deployService.installBundles(bundles);
+	/**
+	 * @see MetadataDeployServiceImpl#installBundles(java.util.Collection)
+	 */
+	@Test(expected = APIException.class)
+	public void installBundles_shouldThrowAPIExceptionIfBundleThrowsAnyException() {
+		deployService.installBundles(Arrays.<MetadataBundle>asList(testBundle6));
 	}
 
 	/**
@@ -99,7 +103,6 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	 */
 	@Test
 	public void installPackage_shouldInstallPackagesOnlyIfNecessary() throws Exception {
-
 		// Test package contains visit type { name: "Outpatient", uuid: "3371a4d4-f66f-4454-a86d-92c7b3da990c" }
 		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
 		final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
@@ -126,8 +129,8 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	/**
 	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
 	 */
-	@Test(expected = RuntimeException.class)
-	public void installPackage_shouldThrowExceptionForInvalidFilename() throws Exception {
+	@Test(expected = APIException.class)
+	public void installPackage_shouldThrowAPIExceptionForInvalidFilename() throws Exception {
 		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
 
 		deployService.installPackage("xxx.zip", getClass().getClassLoader(), TEST_PACKAGE_GROUP_UUID);
@@ -136,8 +139,8 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	/**
 	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
 	 */
-	@Test(expected = RuntimeException.class)
-	public void installPackage_shouldThrowExceptionForNonExistentPackage() throws Exception {
+	@Test(expected = APIException.class)
+	public void installPackage_shouldThrowAPIExceptionForNonExistentPackage() throws Exception {
 		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
 
 		deployService.installPackage("xxx-1.zip", getClass().getClassLoader(), TEST_PACKAGE_GROUP_UUID);
@@ -146,8 +149,8 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	/**
 	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
 	 */
-	@Test(expected = RuntimeException.class)
-	public void installPackage_shouldThrowExceptionForCorruptPackage() throws Exception {
+	@Test(expected = APIException.class)
+	public void installPackage_shouldThrowAPIExceptionForCorruptPackage() throws Exception {
 		final String TEST_CORRUPTPACKAGE_GROUP_UUID = "83E38E01-5ACA-4D64-8560-5D4587F62D4A";
 
 		deployService.installPackage("test-corruptpackage-1.zip", getClass().getClassLoader(), TEST_CORRUPTPACKAGE_GROUP_UUID);
@@ -243,6 +246,17 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	public static class TestBundle5 extends AbstractMetadataBundle {
 		@Override
 		public void install() { }
+	}
+
+	/**
+	 * Throws an NPE on install
+	 */
+	@Component
+	public static class TestBundle6 extends AbstractMetadataBundle {
+		@Override
+		public void install() {
+			throw new NullPointerException();
+		}
 	}
 
 	/**

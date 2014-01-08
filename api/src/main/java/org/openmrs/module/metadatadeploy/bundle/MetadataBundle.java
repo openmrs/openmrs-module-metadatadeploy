@@ -21,6 +21,7 @@ public interface MetadataBundle {
 
 	/**
 	 * Performs the installation of the metadata items
+	 * @throws Exception if an error occurs
 	 */
-	void install();
+	void install() throws Exception;
 }
