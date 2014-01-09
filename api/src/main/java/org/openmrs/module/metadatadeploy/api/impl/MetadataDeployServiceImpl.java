@@ -183,6 +183,8 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 				((ObjectMergeHandler) handler).merge(existing, incoming);
 			}
 
+			// TODO the evict and overwrite approach is fast... but it doesn't work for metadata objects that own other objects. Need to fix this!
+
 			if (usesId(existing)) {
 				// Steal existing object's id
 				incoming.setId(existing.getId());
