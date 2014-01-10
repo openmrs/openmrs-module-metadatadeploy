@@ -14,10 +14,11 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
+import org.openmrs.LocationAttributeType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,14 +26,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for patient identifier types
  */
 @Handler(supports = { PatientIdentifierType.class })
-public class PatientIdentifierTypeDeployHandler implements ObjectDeployHandler<PatientIdentifierType> {
+public class PatientIdentifierTypeDeployHandler extends AbstractObjectDeployHandler<PatientIdentifierType> {
 
 	@Autowired
 	@Qualifier("patientService")
 	private PatientService patientService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(PatientIdentifierType obj) {
@@ -70,5 +71,13 @@ public class PatientIdentifierTypeDeployHandler implements ObjectDeployHandler<P
 	@Override
 	public void remove(PatientIdentifierType obj, String reason) {
 		patientService.retirePatientIdentifierType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(PatientIdentifierType incoming, PatientIdentifierType existing) {
+		return new String[] { "patientIdentifierTypeId" };
 	}
 }

@@ -55,4 +55,12 @@ public interface ObjectDeployHandler<T extends OpenmrsObject> {
 	 * @param reason the reason for removal
 	 */
 	void remove(T obj, String reason);
+
+	/**
+	 * Gets the names of fields to exclude during merging
+	 * @param incoming the incoming object
+	 * @param existing the existing object
+	 * @return the field names
+	 */
+	String[] getMergeExcludedFields(T incoming, T existing);
 }

@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.EncounterType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.EncounterService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for encounter types
  */
 @Handler(supports = { EncounterType.class })
-public class EncounterTypeDeployHandler implements ObjectDeployHandler<EncounterType> {
+public class EncounterTypeDeployHandler extends AbstractObjectDeployHandler<EncounterType> {
 
 	@Autowired
 	@Qualifier("encounterService")
 	private EncounterService encounterService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(EncounterType obj) {
@@ -70,5 +70,13 @@ public class EncounterTypeDeployHandler implements ObjectDeployHandler<Encounter
 	@Override
 	public void remove(EncounterType obj, String reason) {
 		encounterService.retireEncounterType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(EncounterType incoming, EncounterType existing) {
+		return new String[] { "encounterTypeId" };
 	}
 }

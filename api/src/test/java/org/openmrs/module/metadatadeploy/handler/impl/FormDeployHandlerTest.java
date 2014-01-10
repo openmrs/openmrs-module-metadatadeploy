@@ -58,6 +58,7 @@ public class FormDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(form("Updated name", "Updated desc", "enc-type2-uuid", "2.0", "form-uuid"));
 
 		Form updated = Context.getFormService().getFormByUuid("form-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 		Assert.assertThat(updated.getEncounterType(), is(Context.getEncounterService().getEncounterTypeByUuid("enc-type2-uuid")));

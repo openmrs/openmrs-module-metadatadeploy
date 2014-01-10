@@ -47,6 +47,7 @@ public class PersonAttributeTypeDeployHandlerTest extends BaseModuleContextSensi
 		deployService.installObject(personAttributeType("Updated name", "Updated desc", String.class, null, false, 1, "obj-uuid"));
 
 		PersonAttributeType updated = Context.getPersonService().getPersonAttributeTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

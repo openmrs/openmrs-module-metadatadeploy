@@ -47,6 +47,7 @@ public class PatientIdentifierTypeDeployHandlerTest extends BaseModuleContextSen
 		deployService.installObject(patientIdentifierType("Updated name", "Updated desc", null, null, null, null, false, "obj-uuid"));
 
 		PatientIdentifierType updated = Context.getPatientService().getPatientIdentifierTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

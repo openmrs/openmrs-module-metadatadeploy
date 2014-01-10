@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.VisitService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for visit attribute types
  */
 @Handler(supports = { VisitAttributeType.class })
-public class VisitAttributeTypeDeployHandler implements ObjectDeployHandler<VisitAttributeType> {
+public class VisitAttributeTypeDeployHandler extends AbstractObjectDeployHandler<VisitAttributeType> {
 
 	@Autowired
 	@Qualifier("visitService")
 	private VisitService visitService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(VisitAttributeType obj) {
@@ -70,5 +70,13 @@ public class VisitAttributeTypeDeployHandler implements ObjectDeployHandler<Visi
 	@Override
 	public void remove(VisitAttributeType obj, String reason) {
 		visitService.retireVisitAttributeType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(VisitAttributeType incoming, VisitAttributeType existing) {
+		return new String[] { "visitAttributeTypeId" };
 	}
 }

@@ -48,6 +48,7 @@ public class RelationshipTypeDeployHandlerTest extends BaseModuleContextSensitiv
 		deployService.installObject(relationshipType("Updated AtoB", "Updated BtoA", "Updated desc", "obj-uuid"));
 
 		RelationshipType updated = Context.getPersonService().getRelationshipTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getaIsToB(), is("Updated AtoB"));
 		Assert.assertThat(updated.getbIsToA(), is("Updated BtoA"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));

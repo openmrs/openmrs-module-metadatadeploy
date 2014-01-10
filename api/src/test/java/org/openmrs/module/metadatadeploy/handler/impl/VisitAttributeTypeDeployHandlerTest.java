@@ -48,6 +48,7 @@ public class VisitAttributeTypeDeployHandlerTest extends BaseModuleContextSensit
 		deployService.installObject(visitAttributeType("Updated name", "Updated desc", FreeTextDatatype.class, null, 0, 1, "obj-uuid"));
 
 		VisitAttributeType updated = Context.getVisitService().getVisitAttributeTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

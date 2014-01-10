@@ -47,6 +47,7 @@ public class LocationDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(location("Updated name", "Updated desc", "obj-uuid"));
 
 		Location updated = Context.getLocationService().getLocationByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

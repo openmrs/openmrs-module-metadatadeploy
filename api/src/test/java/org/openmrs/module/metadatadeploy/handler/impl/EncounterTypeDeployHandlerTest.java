@@ -51,6 +51,7 @@ public class EncounterTypeDeployHandlerTest extends BaseModuleContextSensitiveTe
 		deployService.installObject(encounterType("Updated name", "Updated desc", "obj-uuid"));
 
 		EncounterType updated = Context.getEncounterService().getEncounterTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

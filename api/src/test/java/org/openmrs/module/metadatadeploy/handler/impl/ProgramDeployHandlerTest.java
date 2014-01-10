@@ -58,6 +58,7 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(program("New name", "New desc", MALARIA_PROGRAM_UUID, "obj1-uuid"));
 
 		Program updated = Context.getProgramWorkflowService().getProgramByUuid("obj1-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("New name"));
 		Assert.assertThat(updated.getDescription(), is("New desc"));
 		Assert.assertThat(updated.getConcept(), is(Context.getConceptService().getConceptByUuid(MALARIA_PROGRAM_UUID)));

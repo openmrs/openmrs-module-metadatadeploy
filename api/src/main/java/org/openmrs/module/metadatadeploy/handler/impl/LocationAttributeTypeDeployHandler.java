@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for location attribute types
  */
 @Handler(supports = { LocationAttributeType.class })
-public class LocationAttributeTypeDeployHandler implements ObjectDeployHandler<LocationAttributeType> {
+public class LocationAttributeTypeDeployHandler extends AbstractObjectDeployHandler<LocationAttributeType> {
 
 	@Autowired
 	@Qualifier("locationService")
 	private LocationService locationService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(LocationAttributeType obj) {
@@ -70,5 +70,13 @@ public class LocationAttributeTypeDeployHandler implements ObjectDeployHandler<L
 	@Override
 	public void remove(LocationAttributeType obj, String reason) {
 		locationService.retireLocationAttributeType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(LocationAttributeType incoming, LocationAttributeType existing) {
+		return new String[] { "locationAttributeTypeId" };
 	}
 }

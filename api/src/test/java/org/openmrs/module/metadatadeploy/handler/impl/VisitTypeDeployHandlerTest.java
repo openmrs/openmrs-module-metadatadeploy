@@ -47,6 +47,7 @@ public class VisitTypeDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(visitType("Updated name", "Updated desc", "obj-uuid"));
 
 		VisitType updated = Context.getVisitService().getVisitTypeByUuid("obj-uuid");
+		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("Updated name"));
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
 

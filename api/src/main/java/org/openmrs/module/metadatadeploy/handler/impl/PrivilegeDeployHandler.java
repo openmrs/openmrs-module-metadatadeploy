@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.Privilege;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.UserService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for privileges
  */
 @Handler(supports = { Privilege.class })
-public class PrivilegeDeployHandler implements ObjectDeployHandler<Privilege> {
+public class PrivilegeDeployHandler extends AbstractObjectDeployHandler<Privilege> {
 
 	@Autowired
 	@Qualifier("userService")
 	private UserService userService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(Privilege obj) {
@@ -70,5 +70,13 @@ public class PrivilegeDeployHandler implements ObjectDeployHandler<Privilege> {
 	@Override
 	public void remove(Privilege obj, String reason) {
 		userService.purgePrivilege(obj);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(Privilege incoming, Privilege existing) {
+		return new String[] { };
 	}
 }

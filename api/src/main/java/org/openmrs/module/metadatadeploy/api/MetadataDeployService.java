@@ -49,9 +49,9 @@ public interface MetadataDeployService {
 	/**
 	 * Installs the incoming object
 	 * @param incoming the incoming object
-	 * @return true if an existing object was overwritten
+	 * @return the installed object (can be incoming or existing)
 	 */
-	boolean installObject(OpenmrsObject incoming);
+	OpenmrsObject installObject(OpenmrsObject incoming);
 
 	/**
 	 * Installs all objects from the given source

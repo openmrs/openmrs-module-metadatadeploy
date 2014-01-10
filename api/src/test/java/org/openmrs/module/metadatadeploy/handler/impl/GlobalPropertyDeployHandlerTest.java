@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.EncounterType;
-import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.SerializingCustomDatatype;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounterType;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
 
 /**

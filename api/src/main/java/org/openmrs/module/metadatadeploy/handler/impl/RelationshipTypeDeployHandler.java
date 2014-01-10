@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.RelationshipType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PersonService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for person relationship type
  */
 @Handler(supports = { RelationshipType.class })
-public class RelationshipTypeDeployHandler implements ObjectDeployHandler<RelationshipType> {
+public class RelationshipTypeDeployHandler extends AbstractObjectDeployHandler<RelationshipType> {
 
 	@Autowired
 	@Qualifier("personService")
@@ -33,7 +33,7 @@ public class RelationshipTypeDeployHandler implements ObjectDeployHandler<Relati
 
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(RelationshipType obj) {
@@ -71,5 +71,13 @@ public class RelationshipTypeDeployHandler implements ObjectDeployHandler<Relati
 	@Override
 	public void remove(RelationshipType obj, String reason) {
 		personService.retireRelationshipType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(RelationshipType incoming, RelationshipType existing) {
+		return new String[] { "relationshipTypeId" };
 	}
 }

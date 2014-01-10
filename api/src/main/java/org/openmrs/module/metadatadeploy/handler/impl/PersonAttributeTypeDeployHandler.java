@@ -18,7 +18,7 @@ import org.hibernate.SessionFactory;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PersonService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for person attribute types
  */
 @Handler(supports = { PersonAttributeType.class })
-public class PersonAttributeTypeDeployHandler implements ObjectDeployHandler<PersonAttributeType> {
+public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandler<PersonAttributeType> {
 
 	@Autowired
 	@Qualifier("personService")
@@ -36,7 +36,7 @@ public class PersonAttributeTypeDeployHandler implements ObjectDeployHandler<Per
 	private SessionFactory sessionFactory;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(PersonAttributeType obj) {
@@ -79,5 +79,13 @@ public class PersonAttributeTypeDeployHandler implements ObjectDeployHandler<Per
 	@Override
 	public void remove(PersonAttributeType obj, String reason) {
 		personService.retirePersonAttributeType(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(PersonAttributeType incoming, PersonAttributeType existing) {
+		return new String[] { "personAttributeTypeId" };
 	}
 }

@@ -17,7 +17,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.Location;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for locations
  */
 @Handler(supports = { Location.class })
-public class LocationDeployHandler implements ObjectDeployHandler<Location> {
+public class LocationDeployHandler extends AbstractObjectDeployHandler<Location> {
 
 	@Autowired
 	@Qualifier("locationService")
@@ -69,5 +69,13 @@ public class LocationDeployHandler implements ObjectDeployHandler<Location> {
 	@Override
 	public void remove(Location obj, String reason) {
 		locationService.retireLocation(obj, reason);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String[] getMergeExcludedFields(Location incoming, Location existing) {
+		return new String[] { "locationId" };
 	}
 }

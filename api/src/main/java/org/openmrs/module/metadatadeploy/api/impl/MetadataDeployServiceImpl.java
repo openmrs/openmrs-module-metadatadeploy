@@ -21,11 +21,12 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.customdatatype.SingleCustomValue;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
 import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
-import org.openmrs.module.metadatadeploy.handler.ObjectMergeHandler;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatasharing.ImportConfig;
 import org.openmrs.module.metadatasharing.ImportMode;
@@ -166,7 +167,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#installObject(org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public boolean installObject(OpenmrsObject incoming) {
+	public OpenmrsObject installObject(OpenmrsObject incoming) {
 		ObjectDeployHandler handler = getHandler(incoming.getClass());
 
 		// Look for existing by primary identifier (i.e. exact match)
@@ -178,25 +179,15 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		}
 
 		if (existing != null) {
-			// Optionally perform merge operation
-			if (handler instanceof ObjectMergeHandler) {
-				((ObjectMergeHandler) handler).merge(existing, incoming);
-			}
+			// Do per-field copy of incoming to existing
+			String[] excludedFields = handler.getMergeExcludedFields(incoming, existing);
+			ObjectUtils.copy(incoming, existing, excludedFields);
 
-			// TODO the evict and overwrite approach is fast... but it doesn't work for metadata objects that own other objects. Need to fix this!
-
-			if (usesId(existing)) {
-				// Steal existing object's id
-				incoming.setId(existing.getId());
-			}
-
-			// Evict existing so that it can completely overwritten
-			Context.evictFromSession(existing);
+			return handler.save(existing);
 		}
-
-		handler.save(incoming);
-
-		return existing != null;
+		else {
+			return handler.save(incoming);
+		}
 	}
 
 	/**
@@ -260,20 +251,5 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		}
 
 		throw new RuntimeException("No handler class found for " + clazz.getName());
-	}
-
-	/**
-	 * Checks if an object uses the the standard id property
-	 * @param obj the object
-	 * @return true if it uses id
-	 */
-	protected boolean usesId(OpenmrsObject obj) {
-		try {
-			obj.getId();
-			return true;
-		}
-		catch (UnsupportedOperationException ex) {
-			return false;
-		}
 	}
 }

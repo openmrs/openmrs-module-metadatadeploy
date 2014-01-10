@@ -46,8 +46,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @return the installed object
 	 */
 	protected OpenmrsObject install(OpenmrsObject incoming) {
-		deployService.installObject(incoming);
-		return incoming;
+		return deployService.installObject(incoming);
 	}
 
 	/**

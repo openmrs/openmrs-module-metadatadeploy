@@ -17,15 +17,7 @@ package org.openmrs.module.metadatadeploy.handler;
 import org.openmrs.OpenmrsObject;
 
 /**
- * Some metadata objects are merged rather than overwritten. For example an existing global property should retain
- * it's value if the incoming object doesn't have a value
+ * Abstract base class for object deploy handlers
  */
-public interface ObjectMergeHandler<T extends OpenmrsObject> {
-
-	/**
-	 * Merges properties of an existing object into the incoming object
-	 * @param existing the existing object
-	 * @param incoming the incoming object
-	 */
-	void merge(T existing, T incoming);
+public abstract class AbstractObjectDeployHandler<T extends OpenmrsObject> implements ObjectDeployHandler<T> {
 }

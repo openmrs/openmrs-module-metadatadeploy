@@ -18,8 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
-import org.openmrs.module.metadatadeploy.handler.ObjectMergeHandler;
+import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,14 +27,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Deployment handler for global properties
  */
 @Handler(supports = { GlobalProperty.class })
-public class GlobalPropertyDeployHandler implements ObjectDeployHandler<GlobalProperty>, ObjectMergeHandler<GlobalProperty> {
+public class GlobalPropertyDeployHandler extends AbstractObjectDeployHandler<GlobalProperty> {
 
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService adminService;
 
 	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
 	public String getIdentifier(GlobalProperty obj) {
@@ -76,19 +75,18 @@ public class GlobalPropertyDeployHandler implements ObjectDeployHandler<GlobalPr
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectMergeHandler#merge(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public void merge(GlobalProperty existing, GlobalProperty incoming) {
+	public String[] getMergeExcludedFields(GlobalProperty incoming, GlobalProperty existing) {
 		boolean datatypeMatches = OpenmrsUtil.nullSafeEquals(existing.getDatatypeClassname(), incoming.getDatatypeClassname());
 
 		// Global properties don't really distinguish between blank and null values since the UI doesn't let a user
 		// distinguish between the two
 		Object incomingValue = incoming.getValue();
 		boolean incomingHasNoValue = incomingValue == null || (incomingValue instanceof String && StringUtils.isEmpty((String) incomingValue));
+		boolean preserveValue = existing.getValue() != null && incomingHasNoValue && datatypeMatches;
 
-		if (existing.getValue() != null && incomingHasNoValue && datatypeMatches) {
-			incoming.setValue(existing.getValue());
-		}
+		return preserveValue ? new String[] { "value" } : new String[] {};
 	}
 }
