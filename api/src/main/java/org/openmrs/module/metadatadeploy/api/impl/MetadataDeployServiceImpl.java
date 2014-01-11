@@ -247,6 +247,17 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	}
 
 	/**
+	 * @see MetadataDeployService#overwriteObject(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public <T extends OpenmrsObject> void overwriteObject(T source, T target) {
+		ObjectDeployHandler<T> handler = getHandler(source);
+
+		handler.overwrite(source, target);
+		handler.save(target);
+	}
+
+	/**
 	 * Convenience method to get the handler for the given object
 	 * @param obj the object
 	 * @return the handler

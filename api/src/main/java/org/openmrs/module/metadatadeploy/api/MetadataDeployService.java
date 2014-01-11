@@ -83,4 +83,11 @@ public interface MetadataDeployService {
 	 * @return the object
 	 */
 	<T extends OpenmrsObject> T saveObject(T obj);
+
+	/**
+	 * Overwrites one object with another
+	 * @param source the source object
+	 * @param target the target object
+	 */
+	<T extends OpenmrsObject> void overwriteObject(T source, T target);
 }
