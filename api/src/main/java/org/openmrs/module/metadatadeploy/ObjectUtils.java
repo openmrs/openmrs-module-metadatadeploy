@@ -73,7 +73,7 @@ public class ObjectUtils {
 						reflector.writeField(target, fieldName, value, definedIn);
 					}
 				} else {
-					if (value instanceof OpenmrsObject) {
+					if (value instanceof OpenmrsObject) { // TODO is this needed?
 						updateBackReferences(value, source, target);
 					}
 

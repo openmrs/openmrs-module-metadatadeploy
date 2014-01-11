@@ -21,7 +21,6 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.customdatatype.SingleCustomValue;
 import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
@@ -53,7 +52,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 
 	protected static final Log log = LogFactory.getLog(MetadataDeployServiceImpl.class);
 
-	private Map<Class<?>, ObjectDeployHandler> handlers;
+	private Map<Class<? extends OpenmrsObject>, ObjectDeployHandler> handlers;
 
 	/**
 	 * Sets the object handlers, reorganising them into a map
@@ -61,13 +60,18 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 */
 	@Autowired
 	public void setHandlers(Set<ObjectDeployHandler> handlers) {
-		this.handlers = new HashMap<Class<?>, ObjectDeployHandler>();
+		this.handlers = new HashMap<Class<? extends OpenmrsObject>, ObjectDeployHandler>();
 
 		for (ObjectDeployHandler handler : handlers) {
 			Handler handlerAnnotation = handler.getClass().getAnnotation(Handler.class);
 			if (handlerAnnotation != null) {
 				for (Class<?> supportedClass : handlerAnnotation.supports()) {
-					this.handlers.put(supportedClass, handler);
+					if (OpenmrsObject.class.isAssignableFrom(supportedClass)) {
+						this.handlers.put((Class<? extends OpenmrsObject>) supportedClass, handler);
+					}
+					else {
+						throw new APIException("Handler annotation specifies a non OpenmrsObject subclass");
+					}
 				}
 			}
 		}
@@ -167,11 +171,18 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#installObject(org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public OpenmrsObject installObject(OpenmrsObject incoming) {
-		ObjectDeployHandler handler = getHandler(incoming.getClass());
+	public <T extends OpenmrsObject> T installObject(T incoming) {
+		ObjectDeployHandler<T> handler = getHandler(incoming);
+
+		// Get globally unique identifier
+		String identifier = handler.getIdentifier(incoming);
+
+		if (identifier == null) {
+			throw new APIException("Can't install object with no identifier");
+		}
 
 		// Look for existing by primary identifier (i.e. exact match)
-		OpenmrsObject existing = handler.fetch(handler.getIdentifier(incoming));
+		T existing = handler.fetch(identifier);
 
 		// If no exact match, look for another existing item that should be replaced
 		if (existing == null) {
@@ -200,8 +211,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 
 		try {
 			while ((incoming = source.fetchNext()) != null) {
-				installObject(incoming);
-				installed.add(incoming);
+				installed.add(installObject(incoming));
 			}
 			return installed;
 		}
@@ -214,8 +224,8 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#uninstallObject(org.openmrs.OpenmrsObject, String)
 	 */
 	@Override
-	public void uninstallObject(OpenmrsObject outgoing, String reason) {
-		ObjectDeployHandler handler = getHandler(outgoing.getClass());
+	public <T extends OpenmrsObject> void uninstallObject(T outgoing, String reason) {
+		ObjectDeployHandler<T> handler = getHandler(outgoing);
 
 		handler.remove(outgoing, reason);
 	}
@@ -225,17 +235,27 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 */
 	@Override
 	public <T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid) {
-		ObjectDeployHandler handler = getHandler(clazz);
-		return (T) handler.fetch(uuid);
+		ObjectDeployHandler<T> handler = getHandler(clazz);
+		return handler.fetch(uuid);
 	}
 
 	/**
 	 * @see MetadataDeployService#saveObject(org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public <T extends OpenmrsObject> T saveObject(OpenmrsObject obj) {
-		ObjectDeployHandler handler = getHandler(obj.getClass());
-		return (T) handler.save(obj);
+	public <T extends OpenmrsObject> T saveObject(T obj) {
+		ObjectDeployHandler<T> handler = getHandler(obj);
+		return handler.save(obj);
+	}
+
+	/**
+	 * Convenience method to get the handler for the given object
+	 * @param obj the object
+	 * @return the handler
+	 * @throws RuntimeException if no suitable handler exists
+	 */
+	protected <T extends OpenmrsObject> ObjectDeployHandler<T> getHandler(T obj) throws RuntimeException {
+		return getHandler((Class<T>) obj.getClass());
 	}
 
 	/**
@@ -244,8 +264,8 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @return the handler
 	 * @throws RuntimeException if no suitable handler exists
 	 */
-	protected ObjectDeployHandler getHandler(Class<? extends OpenmrsObject> clazz) throws RuntimeException {
-		ObjectDeployHandler handler = handlers.get(clazz);
+	protected <T extends OpenmrsObject> ObjectDeployHandler<T> getHandler(Class<T> clazz) throws RuntimeException {
+		ObjectDeployHandler<T> handler = handlers.get(clazz);
 		if (handler != null) {
 			return handler;
 		}

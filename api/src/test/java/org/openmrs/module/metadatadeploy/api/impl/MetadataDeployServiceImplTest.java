@@ -29,6 +29,7 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
+import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.openmrs.module.metadatadeploy.handler.impl.ProgramDeployHandler;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.aop.framework.Advised;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;

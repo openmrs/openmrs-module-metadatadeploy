@@ -51,7 +51,7 @@ public interface MetadataDeployService {
 	 * @param incoming the incoming object
 	 * @return the installed object (can be incoming or existing)
 	 */
-	OpenmrsObject installObject(OpenmrsObject incoming);
+	<T extends OpenmrsObject> T installObject(T incoming);
 
 	/**
 	 * Installs all objects from the given source
@@ -67,7 +67,7 @@ public interface MetadataDeployService {
 	 * @param outgoing the outgoing object
 	 * @param reason the reason for uninstallation
 	 */
-	void uninstallObject(OpenmrsObject outgoing, String reason);
+	<T extends OpenmrsObject> void uninstallObject(T outgoing, String reason);
 
 	/**
 	 * Fetches an existing object if it exists
@@ -82,5 +82,5 @@ public interface MetadataDeployService {
 	 * @param obj the object
 	 * @return the object
 	 */
-	<T extends OpenmrsObject> T saveObject(OpenmrsObject obj);
+	<T extends OpenmrsObject> T saveObject(T obj);
 }
