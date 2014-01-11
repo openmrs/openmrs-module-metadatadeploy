@@ -32,14 +32,6 @@ public class VisitAttributeTypeDeployHandler extends AbstractObjectDeployHandler
 	private VisitService visitService;
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(VisitAttributeType obj) {
-		return obj.getUuid();
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
@@ -56,27 +48,11 @@ public class VisitAttributeTypeDeployHandler extends AbstractObjectDeployHandler
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public VisitAttributeType findAlternateMatch(VisitAttributeType incoming) {
-		return null;
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
 	 * @param obj the object to remove
 	 */
 	@Override
 	public void remove(VisitAttributeType obj, String reason) {
 		visitService.retireVisitAttributeType(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(VisitAttributeType incoming, VisitAttributeType existing) {
-		return new String[] { "visitAttributeTypeId" };
 	}
 }

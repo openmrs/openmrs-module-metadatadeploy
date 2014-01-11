@@ -32,14 +32,6 @@ public class LocationAttributeTypeDeployHandler extends AbstractObjectDeployHand
 	private LocationService locationService;
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(LocationAttributeType obj) {
-		return obj.getUuid();
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
@@ -56,27 +48,11 @@ public class LocationAttributeTypeDeployHandler extends AbstractObjectDeployHand
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public LocationAttributeType findAlternateMatch(LocationAttributeType incoming) {
-		return null;
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
 	 * @param obj the object to remove
 	 */
 	@Override
 	public void remove(LocationAttributeType obj, String reason) {
 		locationService.retireLocationAttributeType(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(LocationAttributeType incoming, LocationAttributeType existing) {
-		return new String[] { "locationAttributeTypeId" };
 	}
 }

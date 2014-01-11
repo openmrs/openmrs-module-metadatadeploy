@@ -32,14 +32,6 @@ public class EncounterTypeDeployHandler extends AbstractObjectDeployHandler<Enco
 	private EncounterService encounterService;
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(EncounterType obj) {
-		return obj.getUuid();
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
@@ -70,13 +62,5 @@ public class EncounterTypeDeployHandler extends AbstractObjectDeployHandler<Enco
 	@Override
 	public void remove(EncounterType obj, String reason) {
 		encounterService.retireEncounterType(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(EncounterType incoming, EncounterType existing) {
-		return new String[] { "encounterTypeId" };
 	}
 }

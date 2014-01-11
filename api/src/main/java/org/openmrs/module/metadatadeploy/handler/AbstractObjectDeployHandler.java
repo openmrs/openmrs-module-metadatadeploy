@@ -15,9 +15,43 @@
 package org.openmrs.module.metadatadeploy.handler;
 
 import org.openmrs.OpenmrsObject;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 
 /**
  * Abstract base class for object deploy handlers
  */
 public abstract class AbstractObjectDeployHandler<T extends OpenmrsObject> implements ObjectDeployHandler<T> {
+
+	/**
+	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public String getIdentifier(T obj) {
+		return obj.getUuid();
+	}
+
+	/**
+	 * @see ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public T findAlternateMatch(T obj) {
+		return null;
+	}
+
+	/**
+	 * @see ObjectDeployHandler#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public void overwrite(T incoming, T existing) {
+		// If object uses id, keep this to be re-instated after copy
+		boolean usesId = ObjectUtils.usesId(incoming);
+		Integer existingId = usesId ? existing.getId() : null;
+
+		// Do per-field copy of incoming to existing
+		ObjectUtils.copy(incoming, existing);
+
+		if (usesId) {
+			existing.setId(existingId);
+		}
+	}
 }

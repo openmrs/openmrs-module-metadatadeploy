@@ -37,14 +37,6 @@ public class ProgramDeployHandler extends AbstractObjectDeployHandler<Program> {
 	private ProgramWorkflowService programService;
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(Program obj) {
-		return obj.getUuid();
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
@@ -94,13 +86,5 @@ public class ProgramDeployHandler extends AbstractObjectDeployHandler<Program> {
 		}
 
 		programService.saveProgram(obj);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(Program incoming, Program existing) {
-		return new String[] { "programId" };
 	}
 }

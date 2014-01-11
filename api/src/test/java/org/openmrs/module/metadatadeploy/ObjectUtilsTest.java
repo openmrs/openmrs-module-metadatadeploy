@@ -17,6 +17,11 @@ package org.openmrs.module.metadatadeploy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.BaseOpenmrsObject;
+import org.openmrs.Form;
+import org.openmrs.GlobalProperty;
+import org.openmrs.Location;
+import org.openmrs.Privilege;
+import org.openmrs.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,18 +34,24 @@ import static org.hamcrest.Matchers.*;
  */
 public class ObjectUtilsTest {
 
+	/**
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
 	@Test
 	public void copy_shouldCopySourceFieldValuesToTarget() {
 		TestClass1 target = new TestClass1();
 		TestClass1 source = new TestClass1(null, "test", 123.0);
 
-		ObjectUtils.copy(source, target, null);
+		ObjectUtils.copy(source, target);
 
 		Assert.assertThat(target.getId(), nullValue());
 		Assert.assertThat(target.getStringValue(), is("test"));
 		Assert.assertThat(target.getDoubleValue(), is(123.0));
 	}
 
+	/**
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
 	@Test
 	public void copy_shouldUpdateBackReferencesToSource() {
 		TestClass1 target = new TestClass1();
@@ -51,13 +62,16 @@ public class ObjectUtilsTest {
 		source.addOwned(owned1);
 		source.addOwned(owned2);
 
-		ObjectUtils.copy(source, target, null);
+		ObjectUtils.copy(source, target);
 
 		Assert.assertThat(target.getOwned(), contains(owned1, owned2));
 		Assert.assertThat(target.getOwned().get(0).getOwner(), is(target));
 		Assert.assertThat(target.getOwned().get(1).getOwner(), is(target));
 	}
 
+	/**
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
 	@Test
 	public void copy_shouldNotReplaceNonNullCollectionsInTarget() {
 		TestClass1 target = new TestClass1();
@@ -71,22 +85,28 @@ public class ObjectUtilsTest {
 
 		Collection<TestClass2> preCopyOwned = target.getOwned();
 
-		ObjectUtils.copy(source, target, null);
+		ObjectUtils.copy(source, target);
 
 		Assert.assertThat(target.getOwned(), sameInstance(preCopyOwned));
 		Assert.assertThat(target.getOwned(), contains(owned2));
 	}
 
+	/**
+	 * @see org.openmrs.module.metadatadeploy.ObjectUtils#usesId(org.openmrs.OpenmrsObject)
+	 */
 	@Test
-	public void copy_shouldPreserveExcludedFieldNames() {
-		TestClass1 target = new TestClass1(1, "", 345.0);
-		TestClass1 source = new TestClass1(2, "test", 123);
+	public void usesId() {
+		Assert.assertThat(ObjectUtils.usesId(new Location()), is(true));
+		Assert.assertThat(ObjectUtils.usesId(new Form()), is(true));
 
-		ObjectUtils.copy(source, target, new String[] { "id" });
-
-		Assert.assertThat(target.getId(), is(1));
+		Assert.assertThat(ObjectUtils.usesId(new GlobalProperty()), is(false));
+		Assert.assertThat(ObjectUtils.usesId(new Role()), is(false));
+		Assert.assertThat(ObjectUtils.usesId(new Privilege()), is(false));
 	}
 
+	/**
+	 * Class for testing
+	 */
 	public static class TestClass1 extends BaseOpenmrsObject {
 
 		private Integer id;

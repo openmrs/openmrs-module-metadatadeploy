@@ -71,12 +71,4 @@ public class RoleDeployHandler extends AbstractObjectDeployHandler<Role> {
 	public void remove(Role obj, String reason) {
 		userService.purgeRole(obj);
 	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(Role incoming, Role existing) {
-		return new String[] { };
-	}
 }

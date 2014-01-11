@@ -14,7 +14,6 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
-import org.openmrs.LocationAttributeType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PatientService;
@@ -31,14 +30,6 @@ public class PatientIdentifierTypeDeployHandler extends AbstractObjectDeployHand
 	@Autowired
 	@Qualifier("patientService")
 	private PatientService patientService;
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(PatientIdentifierType obj) {
-		return obj.getUuid();
-	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
@@ -71,13 +62,5 @@ public class PatientIdentifierTypeDeployHandler extends AbstractObjectDeployHand
 	@Override
 	public void remove(PatientIdentifierType obj, String reason) {
 		patientService.retirePatientIdentifierType(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(PatientIdentifierType incoming, PatientIdentifierType existing) {
-		return new String[] { "patientIdentifierTypeId" };
 	}
 }

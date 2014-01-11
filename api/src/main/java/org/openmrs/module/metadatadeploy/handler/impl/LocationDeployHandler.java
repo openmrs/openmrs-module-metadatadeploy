@@ -32,14 +32,6 @@ public class LocationDeployHandler extends AbstractObjectDeployHandler<Location>
 	private LocationService locationService;
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(Location obj) {
-		return obj.getUuid();
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
@@ -56,26 +48,10 @@ public class LocationDeployHandler extends AbstractObjectDeployHandler<Location>
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public Location findAlternateMatch(Location incoming) {
-		return null;
-	}
-
-	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
 	 */
 	@Override
 	public void remove(Location obj, String reason) {
 		locationService.retireLocation(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(Location incoming, Location existing) {
-		return new String[] { "locationId" };
 	}
 }

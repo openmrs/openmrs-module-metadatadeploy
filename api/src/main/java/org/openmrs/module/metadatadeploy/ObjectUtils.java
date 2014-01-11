@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
+ * Utility methods for OpenmrsObjects
  */
 public class ObjectUtils {
 
@@ -39,29 +39,22 @@ public class ObjectUtils {
 	 * @param target the target object
 	 * @param <T> the class of both objects
 	 */
-	public static <T extends OpenmrsObject> void copy(final T source, final T target, String[] excludeFields) {
-		final Set<String> exclude = new HashSet<String>();
-		if (excludeFields != null) {
-			exclude.addAll(Arrays.asList(excludeFields));
-		}
-
+	public static <T extends OpenmrsObject> void copy(final T source, final T target) {
 		reflector.visitSerializableFields(source, new ReflectionProvider.Visitor() {
 			/**
 			 * @see ReflectionProvider#visitSerializableFields(Object, com.thoughtworks.xstream.converters.reflection.ReflectionProvider.Visitor)
 			 */
 			@Override
 			public void visit(String fieldName, Class type, Class definedIn, Object value) {
-				if (exclude.contains(fieldName)) {
-					return;
-				}
-
 				if (Collection.class.isAssignableFrom(type)) {
 					Collection sourceCollection = (Collection) value;
 					Collection targetCollection = (Collection) readField(target, fieldName, definedIn);
 
 					if (sourceCollection != null) {
 						for (Object itemInSourceCollection : sourceCollection) {
-							updateBackReferences(itemInSourceCollection, source, target);
+							if (itemInSourceCollection instanceof OpenmrsObject) {
+								updateBackReferences(itemInSourceCollection, source, target);
+							}
 						}
 					}
 
@@ -73,7 +66,7 @@ public class ObjectUtils {
 						reflector.writeField(target, fieldName, value, definedIn);
 					}
 				} else {
-					if (value instanceof OpenmrsObject) { // TODO is this needed?
+					if (value instanceof OpenmrsObject) {
 						updateBackReferences(value, source, target);
 					}
 
@@ -81,10 +74,6 @@ public class ObjectUtils {
 				}
 			}
 		});
-
-		if (source instanceof SingleCustomValue<?> && !exclude.contains("value")) {
-			((SingleCustomValue<?>) target).setValue(((SingleCustomValue<?>) source).getValue());
-		}
 	}
 
 	/**
@@ -128,5 +117,20 @@ public class ObjectUtils {
 			throw new ObjectAccessException("Cannot access field " + object.getClass().getName() + "." + field.getName());
 		}
 		return result;
+	}
+
+	/**
+	 * Checks if an object uses the the standard id property
+	 * @param obj the object
+	 * @return true if it uses id
+	 */
+	public static boolean usesId(OpenmrsObject obj) {
+		try {
+			obj.getId();
+			return true;
+		}
+		catch (UnsupportedOperationException ex) {
+			return false;
+		}
 	}
 }

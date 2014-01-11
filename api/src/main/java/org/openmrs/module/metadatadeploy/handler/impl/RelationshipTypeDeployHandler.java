@@ -31,29 +31,12 @@ public class RelationshipTypeDeployHandler extends AbstractObjectDeployHandler<R
 	@Qualifier("personService")
 	private PersonService personService;
 
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(RelationshipType obj) {
-		return obj.getUuid();
-	}
-
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
 	public RelationshipType fetch(String uuid) {
 		return personService.getRelationshipTypeByUuid(uuid);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public RelationshipType findAlternateMatch(RelationshipType incoming) {
-		return null;
 	}
 
 	/**
@@ -71,13 +54,5 @@ public class RelationshipTypeDeployHandler extends AbstractObjectDeployHandler<R
 	@Override
 	public void remove(RelationshipType obj, String reason) {
 		personService.retireRelationshipType(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(RelationshipType incoming, RelationshipType existing) {
-		return new String[] { "relationshipTypeId" };
 	}
 }

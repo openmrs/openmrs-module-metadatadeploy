@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.customdatatype.SingleCustomValue;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,18 +76,39 @@ public class GlobalPropertyDeployHandler extends AbstractObjectDeployHandler<Glo
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 * @param incoming
+	 * @param existing
+	 * @see org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public String[] getMergeExcludedFields(GlobalProperty incoming, GlobalProperty existing) {
-		boolean datatypeMatches = OpenmrsUtil.nullSafeEquals(existing.getDatatypeClassname(), incoming.getDatatypeClassname());
+	public void overwrite(GlobalProperty incoming, GlobalProperty existing) {
+		boolean datatypeMatches = OpenmrsUtil.nullSafeEquals(incoming.getDatatypeClassname(), existing.getDatatypeClassname());
 
-		// Global properties don't really distinguish between blank and null values since the UI doesn't let a user
-		// distinguish between the two
-		Object incomingValue = incoming.getValue();
-		boolean incomingHasNoValue = incomingValue == null || (incomingValue instanceof String && StringUtils.isEmpty((String) incomingValue));
-		boolean preserveValue = existing.getValue() != null && incomingHasNoValue && datatypeMatches;
+		Object existingValue = existing.getValue();
 
-		return preserveValue ? new String[] { "value" } : new String[] {};
+		// We keep the existing property value if the incoming property doesn't have a value and the datatypes match
+		boolean preserveValue = !hasValue(incoming) && datatypeMatches;
+
+		super.overwrite(incoming, existing);
+
+		// The value field won't have been copied as it is transient, so we need to explicitly set the value now
+		existing.setValue(preserveValue ? existingValue : incoming.getValue());
+	}
+
+	/**
+	 * Global properties don't really distinguish between blank and null values since the UI doesn't let a user
+	 * distinguish between the two. This method determibes if a global property has a value.
+	 * @param obj the global property
+	 * @return true if it has value
+	 */
+	private boolean hasValue(GlobalProperty obj) {
+		Object val = obj.getValue();
+		if (val == null) {
+			return false;
+		}
+		else if (val instanceof String) {
+			return StringUtils.isNotEmpty((String) val);
+		}
+		return true;
 	}
 }

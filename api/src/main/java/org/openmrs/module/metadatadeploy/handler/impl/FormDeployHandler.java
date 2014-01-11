@@ -18,7 +18,6 @@ import org.openmrs.Form;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.FormService;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -31,14 +30,6 @@ public class FormDeployHandler extends AbstractObjectDeployHandler<Form> {
 	@Autowired
 	@Qualifier("formService")
 	private FormService formService;
-
-	/**
-	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String getIdentifier(Form obj) {
-		return obj.getUuid();
-	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
@@ -71,13 +62,5 @@ public class FormDeployHandler extends AbstractObjectDeployHandler<Form> {
 	@Override
 	public void remove(Form obj, String reason) {
 		formService.retireForm(obj, reason);
-	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(Form incoming, Form existing) {
-		return new String[] { "formId" };
 	}
 }

@@ -71,12 +71,4 @@ public class PrivilegeDeployHandler extends AbstractObjectDeployHandler<Privileg
 	public void remove(Privilege obj, String reason) {
 		userService.purgePrivilege(obj);
 	}
-
-	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#getMergeExcludedFields(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
-	 */
-	@Override
-	public String[] getMergeExcludedFields(Privilege incoming, Privilege existing) {
-		return new String[] { };
-	}
 }

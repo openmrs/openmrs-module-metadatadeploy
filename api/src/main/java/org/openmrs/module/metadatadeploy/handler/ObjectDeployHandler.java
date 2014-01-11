@@ -57,10 +57,9 @@ public interface ObjectDeployHandler<T extends OpenmrsObject> {
 	void remove(T obj, String reason);
 
 	/**
-	 * Gets the names of fields to exclude during merging
+	 * Overwrites the existing object with the incoming object
 	 * @param incoming the incoming object
 	 * @param existing the existing object
-	 * @return the field names
 	 */
-	String[] getMergeExcludedFields(T incoming, T existing);
+	void overwrite(T incoming, T existing);
 }

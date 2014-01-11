@@ -190,9 +190,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		}
 
 		if (existing != null) {
-			// Do per-field copy of incoming to existing
-			String[] excludedFields = handler.getMergeExcludedFields(incoming, existing);
-			ObjectUtils.copy(incoming, existing, excludedFields);
+			handler.overwrite(incoming, existing);
 
 			return handler.save(existing);
 		}
