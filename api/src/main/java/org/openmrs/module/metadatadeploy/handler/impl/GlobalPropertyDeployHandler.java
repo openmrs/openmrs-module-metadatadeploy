@@ -92,7 +92,10 @@ public class GlobalPropertyDeployHandler extends AbstractObjectDeployHandler<Glo
 		super.overwrite(incoming, existing);
 
 		// The value field won't have been copied as it is transient, so we need to explicitly set the value now
-		existing.setValue(preserveValue ? existingValue : incoming.getValue());
+		Object value = preserveValue ? existingValue : incoming.getValue();
+		if (value != null) {
+			existing.setValue(value);
+		}
 	}
 
 	/**
