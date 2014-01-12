@@ -59,9 +59,12 @@ public class ObjectUtils {
 					}
 
 					// This collection might be Hibernate managed in which case we can't just replace it
-					if (sourceCollection != null && targetCollection != null) {
+					if (targetCollection != null) {
 						targetCollection.clear();
-						targetCollection.addAll(sourceCollection);
+
+						if (sourceCollection != null) {
+							targetCollection.addAll(sourceCollection);
+						}
 					} else {
 						reflector.writeField(target, fieldName, value, definedIn);
 					}
