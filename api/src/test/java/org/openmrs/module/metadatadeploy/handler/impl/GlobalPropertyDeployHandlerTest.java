@@ -108,6 +108,9 @@ public class GlobalPropertyDeployHandlerTest extends BaseModuleContextSensitiveT
 		GlobalProperty unretired = Context.getAdministrationService().getGlobalPropertyObject("test.property");
 		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));
 		Assert.assertThat(unretired.getPropertyValue(), is("Unretired value"));
+
+		// Check everything can be persisted
+		Context.flushSession();
 	}
 
 	/**

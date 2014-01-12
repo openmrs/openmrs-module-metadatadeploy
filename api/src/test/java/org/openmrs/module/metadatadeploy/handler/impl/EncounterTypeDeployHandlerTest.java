@@ -70,5 +70,8 @@ public class EncounterTypeDeployHandlerTest extends BaseModuleContextSensitiveTe
 		Assert.assertThat(unretired.getDateRetired(), is(nullValue()));
 		Assert.assertThat(unretired.getRetiredBy(), is(nullValue()));
 		Assert.assertThat(unretired.getRetireReason(), is(nullValue()));
+
+		// Check everything can be persisted
+		Context.flushSession();
 	}
 }

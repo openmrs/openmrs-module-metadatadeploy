@@ -16,11 +16,15 @@ package org.openmrs.module.metadatadeploy.api.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
 import org.openmrs.Role;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -37,8 +41,11 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
@@ -178,6 +185,23 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		deployService.saveObject(location);
 
 		Assert.assertThat(location.getId(), notNullValue());
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#overwriteObject(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Test
+	public void overwriteObject_shouldOverwriteObject() throws Exception {
+		Location incoming = location("New name", "New desc", "68265F64-BD50-4E4F-BA1F-23F24E301FBC");
+		Location existing = MetadataUtils.getLocation("9356400c-a5a2-4532-8f2b-2361b3446eb8"); // Xanadu
+
+		deployService.overwriteObject(incoming, existing);
+
+		Assert.assertThat(existing.getName(), is("New name"));
+		Assert.assertThat(existing.getDescription(), is("New desc"));
+		Assert.assertThat(existing.getUuid(), is("68265F64-BD50-4E4F-BA1F-23F24E301FBC"));
+
+		Context.flushSession();
 	}
 
 	/**

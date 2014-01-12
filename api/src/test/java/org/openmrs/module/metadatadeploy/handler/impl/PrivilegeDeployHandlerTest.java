@@ -67,5 +67,8 @@ public class PrivilegeDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(unretired.getDateRetired(), nullValue());
 		Assert.assertThat(unretired.getRetiredBy(), nullValue());
 		Assert.assertThat(unretired.getRetireReason(), nullValue());
+
+		// Check everything can be persisted
+		Context.flushSession();
 	}
 }

@@ -66,5 +66,8 @@ public class PersonAttributeTypeDeployHandlerTest extends BaseModuleContextSensi
 		Assert.assertThat(unretired.getDateRetired(), nullValue());
 		Assert.assertThat(unretired.getRetiredBy(), nullValue());
 		Assert.assertThat(unretired.getRetireReason(), nullValue());
+
+		// Check everything can be persisted
+		Context.flushSession();
 	}
 }
