@@ -185,6 +185,9 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		deployService.saveObject(location);
 
 		Assert.assertThat(location.getId(), notNullValue());
+
+		// Check everything can be persisted
+		Context.flushSession();
 	}
 
 	/**
@@ -201,6 +204,7 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		Assert.assertThat(existing.getDescription(), is("New desc"));
 		Assert.assertThat(existing.getUuid(), is("68265F64-BD50-4E4F-BA1F-23F24E301FBC"));
 
+		// Check everything can be persisted
 		Context.flushSession();
 	}
 

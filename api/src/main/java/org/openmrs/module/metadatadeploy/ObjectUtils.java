@@ -17,14 +17,11 @@ package org.openmrs.module.metadatadeploy;
 import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+import org.hibernate.Hibernate;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.customdatatype.SingleCustomValue;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Utility methods for OpenmrsObjects
@@ -40,12 +37,16 @@ public class ObjectUtils {
 	 * @param <T> the class of both objects
 	 */
 	public static <T extends OpenmrsObject> void copy(final T source, final T target) {
+
+		ensureInitialized(target); // TODO figure out if this is necessary
+
 		reflector.visitSerializableFields(source, new ReflectionProvider.Visitor() {
 			/**
 			 * @see ReflectionProvider#visitSerializableFields(Object, com.thoughtworks.xstream.converters.reflection.ReflectionProvider.Visitor)
 			 */
 			@Override
 			public void visit(String fieldName, Class type, Class definedIn, Object value) {
+
 				if (Collection.class.isAssignableFrom(type)) {
 					Collection sourceCollection = (Collection) value;
 					Collection targetCollection = (Collection) readField(target, fieldName, definedIn);
@@ -65,7 +66,8 @@ public class ObjectUtils {
 						if (sourceCollection != null) {
 							targetCollection.addAll(sourceCollection);
 						}
-					} else {
+					}
+					else {
 						reflector.writeField(target, fieldName, value, definedIn);
 					}
 				} else {
@@ -89,6 +91,8 @@ public class ObjectUtils {
 	 * @param <T> the source and target object class
 	 */
 	protected static <T extends OpenmrsObject> void updateBackReferences(final Object obj, final T source, final T target) {
+		ensureInitialized(obj);
+
 		reflector.visitSerializableFields(obj, new ReflectionProvider.Visitor() {
 			/**
 			 * @see ReflectionProvider#visitSerializableFields(Object, com.thoughtworks.xstream.converters.reflection.ReflectionProvider.Visitor)
@@ -100,6 +104,16 @@ public class ObjectUtils {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Ensures that the given object is initialized if its a Hibernate proxy
+	 * @param obj the object
+	 */
+	protected static void ensureInitialized(Object obj) {
+		if (!Hibernate.isInitialized(obj)) {
+			Hibernate.initialize(obj);
+		}
 	}
 
 	/**
