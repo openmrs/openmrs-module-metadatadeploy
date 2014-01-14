@@ -6,9 +6,12 @@
 			<param name="ConversionPattern" value="[%p] %m%n"/>
 		</layout>
 	</appender>
-	<logger name="org.openmrs.module.kenyacore">
-		<level value="debug" />
-	</logger>
+	<!-- Hibernate HQL logging
+	<logger name="org.hibernate.SQL"><level value="trace" /></logger>
+	<logger name="org.hibernate.engine.query"><level value="trace" /></logger>
+	<logger name="org.hibernate.type"><level value="trace" /></logger>
+	<logger name="org.hibernate.jdbc"><level value="trace" /></logger>
+	-->
 	<root>
 		<level value="warn" />
 		<appender-ref ref="stdout"/>
