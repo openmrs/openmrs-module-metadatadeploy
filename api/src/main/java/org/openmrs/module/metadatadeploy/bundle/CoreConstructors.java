@@ -236,7 +236,6 @@ public class CoreConstructors {
 		Privilege obj = new Privilege();
 		obj.setPrivilege(privilege);
 		obj.setDescription(description);
-		obj.setUuid(UUID.randomUUID().toString());
 		return obj;
 	}
 
@@ -287,7 +286,6 @@ public class CoreConstructors {
 			}, new HashSet()));
 		}
 
-		obj.setUuid(UUID.randomUUID().toString());
 		return obj;
 	}
 
