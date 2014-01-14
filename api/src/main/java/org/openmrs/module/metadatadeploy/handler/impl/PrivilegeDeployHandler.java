@@ -17,9 +17,12 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.Privilege;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.UserService;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.Collections;
 
 /**
  * Deployment handler for privileges
@@ -70,5 +73,14 @@ public class PrivilegeDeployHandler extends AbstractObjectDeployHandler<Privileg
 	@Override
 	public void remove(Privilege obj, String reason) {
 		userService.purgePrivilege(obj);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public void overwrite(Privilege incoming, Privilege existing) {
+		// Do per-field copy of incoming to existing, excluding UUID
+		ObjectUtils.copy(incoming, existing, Collections.singleton("uuid"));
 	}
 }

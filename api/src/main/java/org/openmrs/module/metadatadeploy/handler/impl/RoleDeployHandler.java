@@ -17,9 +17,12 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.Role;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.UserService;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.Collections;
 
 /**
  * Deployment handler for roles
@@ -70,5 +73,14 @@ public class RoleDeployHandler extends AbstractObjectDeployHandler<Role> {
 	@Override
 	public void remove(Role obj, String reason) {
 		userService.purgeRole(obj);
+	}
+
+	/**
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 */
+	@Override
+	public void overwrite(Role incoming, Role existing) {
+		// Do per-field copy of incoming to existing, excluding UUID
+		ObjectUtils.copy(incoming, existing, Collections.singleton("uuid"));
 	}
 }

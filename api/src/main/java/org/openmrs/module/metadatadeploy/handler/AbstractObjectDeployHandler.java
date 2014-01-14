@@ -17,6 +17,8 @@ package org.openmrs.module.metadatadeploy.handler;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.module.metadatadeploy.ObjectUtils;
 
+import java.util.Collections;
+
 /**
  * Abstract base class for object deploy handlers
  */
@@ -48,7 +50,7 @@ public abstract class AbstractObjectDeployHandler<T extends OpenmrsObject> imple
 		Integer existingId = usesId ? existing.getId() : null;
 
 		// Do per-field copy of incoming to existing
-		ObjectUtils.copy(incoming, existing);
+		ObjectUtils.copy(incoming, existing, null);
 
 		if (usesId) {
 			existing.setId(existingId);

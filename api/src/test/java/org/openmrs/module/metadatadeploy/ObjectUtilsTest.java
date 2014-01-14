@@ -25,6 +25,7 @@ import org.openmrs.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -35,14 +36,14 @@ import static org.hamcrest.Matchers.*;
 public class ObjectUtilsTest {
 
 	/**
-	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
 	public void copy_shouldCopySourceFieldValuesToTarget() {
 		TestClass1 target = new TestClass1();
 		TestClass1 source = new TestClass1(null, "test", 123.0);
 
-		ObjectUtils.copy(source, target);
+		ObjectUtils.copy(source, target, null);
 
 		Assert.assertThat(target.getId(), nullValue());
 		Assert.assertThat(target.getStringValue(), is("test"));
@@ -50,7 +51,7 @@ public class ObjectUtilsTest {
 	}
 
 	/**
-	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
 	public void copy_shouldUpdateBackReferencesToSource() {
@@ -62,7 +63,7 @@ public class ObjectUtilsTest {
 		source.addOwned(owned1);
 		source.addOwned(owned2);
 
-		ObjectUtils.copy(source, target);
+		ObjectUtils.copy(source, target, null);
 
 		Assert.assertThat(target.getOwned(), contains(owned1, owned2));
 		Assert.assertThat(target.getOwned().get(0).getOwner(), is(target));
@@ -70,7 +71,22 @@ public class ObjectUtilsTest {
 	}
 
 	/**
-	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject)
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
+	 */
+	@Test
+	public void copy_shouldIgnoreExcludedFields() {
+		TestClass1 target = new TestClass1(1, "abc", 123.0);
+		TestClass1 source = new TestClass1(2, "xyz", 234.0);
+
+		ObjectUtils.copy(source, target, Collections.singleton("stringValue"));
+
+		Assert.assertThat(target.getId(), is(2));
+		Assert.assertThat(target.getStringValue(), is("abc"));
+		Assert.assertThat(target.getDoubleValue(), is(234.0));
+	}
+
+	/**
+	 * @see ObjectUtils#copy(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
 	public void copy_shouldNotReplaceNonNullCollectionsInTarget() {
@@ -85,7 +101,7 @@ public class ObjectUtilsTest {
 
 		Collection<TestClass2> preCopyOwned = target.getOwned();
 
-		ObjectUtils.copy(source, target);
+		ObjectUtils.copy(source, target, null);
 
 		Assert.assertThat(target.getOwned(), sameInstance(preCopyOwned));
 		Assert.assertThat(target.getOwned(), contains(owned2));

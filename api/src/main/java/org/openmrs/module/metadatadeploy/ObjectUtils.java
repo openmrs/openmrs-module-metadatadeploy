@@ -22,6 +22,7 @@ import org.openmrs.OpenmrsObject;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Utility methods for OpenmrsObjects
@@ -34,18 +35,25 @@ public class ObjectUtils {
 	 * Copies an object into another of the same class
 	 * @param source the source object
 	 * @param target the target object
+	 * @param excludeFields the names of fields to be excluded
 	 * @param <T> the class of both objects
 	 */
-	public static <T extends OpenmrsObject> void copy(final T source, final T target) {
+	public static <T extends OpenmrsObject> void copy(final T source, final T target, final Set<String> excludeFields) {
 
 		ensureInitialized(target); // TODO figure out if this is necessary
 
 		reflector.visitSerializableFields(source, new ReflectionProvider.Visitor() {
+
 			/**
 			 * @see ReflectionProvider#visitSerializableFields(Object, com.thoughtworks.xstream.converters.reflection.ReflectionProvider.Visitor)
 			 */
 			@Override
 			public void visit(String fieldName, Class type, Class definedIn, Object value) {
+
+				// Check if field should be excluded from operation
+				if (excludeFields != null && excludeFields.contains(fieldName)) {
+					return;
+				}
 
 				if (Collection.class.isAssignableFrom(type)) {
 					Collection sourceCollection = (Collection) value;

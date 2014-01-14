@@ -14,7 +14,10 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
+import org.hibernate.FlushMode;
+import org.hibernate.SessionFactory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
@@ -22,6 +25,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
@@ -35,6 +40,9 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
 	private MetadataDeployService deployService;
+
+	@Autowired
+	private SessionFactory sessionFactory;
 
 	/**
 	 * Tests use of handler for installation
@@ -84,6 +92,57 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(unretired.getRetireReason(), nullValue());
 
 		// Check everything can be persisted
+		Context.flushSession();
+	}
+
+	/**
+	 * We previously encountered a problem where the session couldn't be flushed at certain stages during installation
+	 * and re-installation of various roles and privileges. It seems like these objects can be cached via the UUID, and
+	 * once we stopped needlessly overwriting UUIDs the problem was fixed.
+	 */
+	@Test
+	public void integration_shouldWorkWithoutFlushes() throws Exception {
+		sessionFactory.getCurrentSession().setFlushMode(FlushMode.MANUAL);
+
+		deployService.installObject(privilege("Privilege1", "Testing"));
+
+		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
+		deployService.installObject(role("Role2", "Testing", idSet("Role1"), null));
+
+		deployService.installObject(privilege("Privilege1", "Testing"));
+
+		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
+
+		Context.flushSession();
+		sessionFactory.getCurrentSession().setFlushMode(FlushMode.AUTO);
+	}
+
+	/**
+	 * Experiment to show that changing a privileges UUID can break things
+	 */
+	@Ignore
+	@Test
+	public void areUuidsUsedForCaching() throws Exception {
+		// Create privilege
+		Privilege priv1 = new Privilege("Privilege1", "Testing");
+		Context.getUserService().savePrivilege(priv1);
+
+		// Create role and add privilege
+		Role role1 = new Role("Role1", "Testing");
+		role1.addPrivilege(priv1);
+		Context.getUserService().saveRole(role1);
+
+		Context.flushSession(); // This flush leads to SQL error (cannot insert into role_privilege) at final flush
+
+		// Change UUID of priv1
+		priv1.setUuid(UUID.randomUUID().toString());
+		Context.getUserService().savePrivilege(priv1);
+
+		// Re-add priv1 to role1
+		role1.getPrivileges().clear();
+		role1.getPrivileges().add(priv1);
+		Context.getUserService().saveRole(role1);
+
 		Context.flushSession();
 	}
 }
