@@ -23,18 +23,19 @@ import org.openmrs.module.metadatadeploy.source.ObjectSource;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Abstract base class for metadata synchronization operations
+ * Class which runs synchronizations of metadata objects
  */
-public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata> implements MetadataSynchronization<T> {
+public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 
-	protected static final Log log = LogFactory.getLog(AbstractMetadataSynchronization.class);
+	protected static final Log log = LogFactory.getLog(MetadataSynchronizationRunner.class);
 
 	protected ObjectSource<T> source;
+
+	protected ObjectSynchronization<T> sync;
 
 	protected Map<Object, Integer> keyCache = new HashMap<Object, Integer>();
 
@@ -43,16 +44,18 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 	protected SyncResult<T> result = new SyncResult<T>();
 
 	/**
-	 * Creates and initiates a new synchronization
+	 * Creates a new synchronization process
+	 * @param source the object source
+	 * @param sync the synchronization
 	 */
-	public AbstractMetadataSynchronization(ObjectSource<T> source) {
+	public MetadataSynchronizationRunner(ObjectSource<T> source, ObjectSynchronization<T> sync) {
 		this.source = source;
+		this.sync = sync;
 	}
 
 	/**
-	 * @see MetadataSynchronization#run()
+	 * Performs the synchronization
 	 */
-	@Override
 	public SyncResult<T> run() {
 		MetadataDeployService deployService = Context.getService(MetadataDeployService.class);
 
@@ -62,7 +65,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 			T next;
 
 			while ((next = source.fetchNext()) != null) {
-				Object syncKey = getObjectSyncKey(next);
+				Object syncKey = sync.getObjectSyncKey(next);
 
 				if (syncKey == null) {
 					log.error("Unable to synchronize object '" + next.getName() + "' with no sync key");
@@ -83,8 +86,8 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 	 * Initializes the key -> object cache
 	 */
 	protected void initializeCache() {
-		for (T obj : fetchAllExisting()) {
-			Object syncKey = getObjectSyncKey(obj);
+		for (T obj : sync.fetchAllExisting()) {
+			Object syncKey = sync.getObjectSyncKey(obj);
 
 			if (syncKey == null) {
 				log.warn("Ignoring object '" + obj.getName() + "' with no sync key");
@@ -112,7 +115,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 	protected void synchronizeObject(MetadataDeployService deployService, Object syncKey, T incoming) {
 		// Look in the cache for an existing object with this sync key
 		Integer existingId = keyCache.get(syncKey);
-		T existing = existingId != null ? fetchExistingById(existingId) : null;
+		T existing = existingId != null ? sync.fetchExistingById(existingId) : null;
 
 		if (existing == null) {
 			// Save incoming as new
@@ -124,8 +127,8 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 		}
 		else {
 			// Compute hashes of incoming and existing locations
-			String incomingHash = getObjectHash(incoming);
-			String existingHash = getObjectHash(existing);
+			String incomingHash = sync.getObjectHash(incoming);
+			String existingHash = sync.getObjectHash(existing);
 
 			// Only update if hashes are different
 			if (!incomingHash.equals(existingHash)) {
@@ -145,7 +148,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 	protected void retireExistingNotInSource(MetadataDeployService deployService) {
 		// Retire objects that weren't in the sync source
 		for (Integer notSyncedId : notSyncedObjects) {
-			T notSynced = fetchExistingById(notSyncedId);
+			T notSynced = sync.fetchExistingById(notSyncedId);
 			if (!notSynced.isRetired()) {
 				deployService.uninstallObject(notSynced, "Not found in sync source");
 
@@ -154,31 +157,4 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 			}
 		}
 	}
-
-	/**
-	 * Fetches all existing objects
-	 * @return the existing objects
-	 */
-	protected abstract List<T> fetchAllExisting();
-
-	/**
-	 * Fetches an existing object by its id
-	 * @param id the object id
-	 * @return the existing object
-	 */
-	protected abstract T fetchExistingById(int id);
-
-	/**
-	 * Gets the synchronization key of the given object
-	 * @param obj the object
-	 * @return the synchronization key
-	 */
-	protected abstract Object getObjectSyncKey(T obj);
-
-	/**
-	 * Gets the hash of the given object
-	 * @param obj the object
-	 * @return the hash
-	 */
-	protected abstract String getObjectHash(T obj);
 }

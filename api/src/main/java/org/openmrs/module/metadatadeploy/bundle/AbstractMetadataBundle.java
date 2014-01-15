@@ -14,9 +14,13 @@
 
 package org.openmrs.module.metadatadeploy.bundle;
 
+import org.openmrs.OpenmrsMetadata;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
+import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
+import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
+import org.openmrs.module.metadatadeploy.sync.SyncResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -64,9 +68,21 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param reason the reason for uninstallation
 	 */
 	protected <T extends OpenmrsObject> void uninstall(T outgoing, String reason) {
+		// We allow passing in of null values such as return value from existing(...)
 		if (outgoing != null) {
 			deployService.uninstallObject(outgoing, reason);
 		}
+	}
+
+	/**
+	 * Performs the given synchronization operation
+	 * @param source the object source
+	 * @param sync the synchronization operation
+	 * @return the synchronization result
+	 */
+	protected <T extends OpenmrsMetadata> SyncResult<T> sync(ObjectSource<T> source, ObjectSynchronization<T> sync) {
+		MetadataSynchronizationRunner runner = new MetadataSynchronizationRunner(source, sync);
+		return runner.run();
 	}
 
 	/**
