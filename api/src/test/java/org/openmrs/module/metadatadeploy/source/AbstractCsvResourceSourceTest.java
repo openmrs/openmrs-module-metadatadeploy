@@ -60,6 +60,7 @@ public class AbstractCsvResourceSourceTest {
 			Location location = new Location();
 			location.setName(line[0]);
 			location.setDescription(line[1]);
+			location.setUuid(line[2]);
 			return location;
 		}
 	}

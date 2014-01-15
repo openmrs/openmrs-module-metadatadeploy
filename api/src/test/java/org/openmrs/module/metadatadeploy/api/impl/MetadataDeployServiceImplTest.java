@@ -166,6 +166,19 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	}
 
 	/**
+	 * @see MetadataDeployServiceImpl#installPackage(String, ClassLoader, String)
+	 */
+	@Test(expected = APIException.class)
+	public void installObject_shouldThrowAPIExceptionForObjectWithoutIdentifier() throws Exception {
+		Location location = new Location();
+		location.setName("Name");
+		location.setDescription("Testing");
+		location.setUuid(null);
+
+		deployService.installObject(location);
+	}
+
+	/**
 	 * @see MetadataDeployServiceImpl#fetchObject(Class, String)
 	 */
 	@Test

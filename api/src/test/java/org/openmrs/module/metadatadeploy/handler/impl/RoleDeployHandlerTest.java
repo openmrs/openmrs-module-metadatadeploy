@@ -26,8 +26,6 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.privilege;
@@ -115,34 +113,5 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 		Context.flushSession();
 		sessionFactory.getCurrentSession().setFlushMode(FlushMode.AUTO);
-	}
-
-	/**
-	 * Experiment to show that changing a privileges UUID can break things
-	 */
-	@Ignore
-	@Test
-	public void areUuidsUsedForCaching() throws Exception {
-		// Create privilege
-		Privilege priv1 = new Privilege("Privilege1", "Testing");
-		Context.getUserService().savePrivilege(priv1);
-
-		// Create role and add privilege
-		Role role1 = new Role("Role1", "Testing");
-		role1.addPrivilege(priv1);
-		Context.getUserService().saveRole(role1);
-
-		Context.flushSession(); // This flush leads to SQL error (cannot insert into role_privilege) at final flush
-
-		// Change UUID of priv1
-		priv1.setUuid(UUID.randomUUID().toString());
-		Context.getUserService().savePrivilege(priv1);
-
-		// Re-add priv1 to role1
-		role1.getPrivileges().clear();
-		role1.getPrivileges().add(priv1);
-		Context.getUserService().saveRole(role1);
-
-		Context.flushSession();
 	}
 }

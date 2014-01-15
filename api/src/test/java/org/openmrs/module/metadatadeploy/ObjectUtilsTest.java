@@ -39,7 +39,15 @@ public class ObjectUtilsTest {
 	 * @see ObjectUtils#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
-	public void copy_shouldCopySourceFieldValuesToTarget() {
+	public void integration() {
+		new ObjectUtils();
+	}
+
+	/**
+	 * @see ObjectUtils#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
+	 */
+	@Test
+	public void overwrite_shouldCopySourceFieldValuesToTarget() {
 		TestClass1 target = new TestClass1();
 		TestClass1 source = new TestClass1(null, "test", 123.0);
 
@@ -54,7 +62,7 @@ public class ObjectUtilsTest {
 	 * @see ObjectUtils#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
-	public void copy_shouldUpdateBackReferencesToSource() {
+	public void overwrite_shouldUpdateBackReferencesToSource() {
 		TestClass1 target = new TestClass1();
 		TestClass1 source = new TestClass1(null, "test", 123);
 
@@ -74,7 +82,7 @@ public class ObjectUtilsTest {
 	 * @see ObjectUtils#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
-	public void copy_shouldIgnoreExcludedFields() {
+	public void overwrite_shouldIgnoreExcludedFields() {
 		TestClass1 target = new TestClass1(1, "abc", 123.0);
 		TestClass1 source = new TestClass1(2, "xyz", 234.0);
 
@@ -89,7 +97,7 @@ public class ObjectUtilsTest {
 	 * @see ObjectUtils#overwrite(org.openmrs.OpenmrsObject, org.openmrs.OpenmrsObject, java.util.Set)
 	 */
 	@Test
-	public void copy_shouldNotReplaceNonNullCollectionsInTarget() {
+	public void overwrite_shouldNotReplaceNonNullCollectionsInTarget() {
 		TestClass1 target = new TestClass1();
 		TestClass1 source = new TestClass1(null, "test", 123);
 
