@@ -45,7 +45,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param incoming the incoming object
 	 * @return the installed object
 	 */
-	protected OpenmrsObject install(OpenmrsObject incoming) {
+	protected <T extends OpenmrsObject> T install(T incoming) {
 		return deployService.installObject(incoming);
 	}
 
@@ -63,7 +63,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param outgoing the outgoing object
 	 * @param reason the reason for uninstallation
 	 */
-	protected void uninstall(OpenmrsObject outgoing, String reason) {
+	protected <T extends OpenmrsObject> void uninstall(T outgoing, String reason) {
 		if (outgoing != null) {
 			deployService.uninstallObject(outgoing, reason);
 		}
