@@ -38,7 +38,7 @@ public class ObjectUtils {
 	 * @param excludeFields the names of fields to be excluded
 	 * @param <T> the class of both objects
 	 */
-	public static <T extends OpenmrsObject> void copy(final T source, final T target, final Set<String> excludeFields) {
+	public static <T extends OpenmrsObject> void overwrite(final T source, final T target, final Set<String> excludeFields) {
 
 		ensureInitialized(target); // TODO figure out if this is necessary
 

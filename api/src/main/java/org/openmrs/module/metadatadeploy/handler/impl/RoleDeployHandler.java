@@ -81,6 +81,6 @@ public class RoleDeployHandler extends AbstractObjectDeployHandler<Role> {
 	@Override
 	public void overwrite(Role incoming, Role existing) {
 		// Do per-field copy of incoming to existing, excluding UUID
-		ObjectUtils.copy(incoming, existing, Collections.singleton("uuid"));
+		ObjectUtils.overwrite(incoming, existing, Collections.singleton("uuid"));
 	}
 }

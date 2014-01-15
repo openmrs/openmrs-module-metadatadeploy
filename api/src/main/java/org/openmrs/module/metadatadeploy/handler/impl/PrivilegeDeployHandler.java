@@ -81,6 +81,6 @@ public class PrivilegeDeployHandler extends AbstractObjectDeployHandler<Privileg
 	@Override
 	public void overwrite(Privilege incoming, Privilege existing) {
 		// Do per-field copy of incoming to existing, excluding UUID
-		ObjectUtils.copy(incoming, existing, Collections.singleton("uuid"));
+		ObjectUtils.overwrite(incoming, existing, Collections.singleton("uuid"));
 	}
 }
