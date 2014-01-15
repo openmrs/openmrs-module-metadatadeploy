@@ -107,7 +107,7 @@ public class ObjectUtils {
 			 */
 			@Override
 			public void visit(String fieldName, Class type, Class definedIn, Object value) {
-				if (value == source) {
+				if (value != null && value == source) {
 					reflector.writeField(obj, fieldName, target, definedIn);
 				}
 			}
