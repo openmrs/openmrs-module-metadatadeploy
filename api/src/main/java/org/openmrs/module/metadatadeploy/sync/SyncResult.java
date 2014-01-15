@@ -14,35 +14,41 @@
 
 package org.openmrs.module.metadatadeploy.sync;
 
-import org.openmrs.OpenmrsObject;
+import org.openmrs.OpenmrsMetadata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Interface for all synchronization operations
+ * Result of a synchronization describing the objects that were created, updated and retired
  */
-public interface ObjectSynchronization<T extends OpenmrsObject> {
+public class SyncResult<T extends OpenmrsMetadata> {
 
-	/**
-	 * Runs the complete synchronization operation
-	 */
-	void run();
+	protected List<T> created = new ArrayList<T>();
+	protected List<T> updated = new ArrayList<T>();
+	protected List<T> retired = new ArrayList<T>();
 
 	/**
 	 * Gets the created objects
 	 * @return the objects
 	 */
-	List<T> getCreatedObjects();
+	public List<T> getCreated() {
+		return created;
+	}
 
 	/**
 	 * Gets the updated objects
 	 * @return the objects
 	 */
-	List<T> getUpdatedObjects();
+	public List<T> getUpdated() {
+		return updated;
+	}
 
 	/**
-	 * Gets the removed objects
+	 * Gets the retired objects
 	 * @return the objects
 	 */
-	List<T> getRemovedObjects();
+	public List<T> getRetired() {
+		return retired;
+	}
 }

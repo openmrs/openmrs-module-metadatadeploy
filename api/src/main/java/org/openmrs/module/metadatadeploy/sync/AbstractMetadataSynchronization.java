@@ -21,7 +21,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.Set;
 /**
  * Abstract base class for metadata synchronization operations
  */
-public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata> implements ObjectSynchronization<T> {
+public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata> implements MetadataSynchronization<T> {
 
 	protected static final Log log = LogFactory.getLog(AbstractMetadataSynchronization.class);
 
@@ -41,9 +40,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 
 	protected Set<Integer> notSyncedObjects = new HashSet<Integer>();
 
-	protected List<T> created = new ArrayList<T>();
-	protected List<T> updated = new ArrayList<T>();
-	protected List<T> retired = new ArrayList<T>();
+	protected SyncResult<T> result = new SyncResult<T>();
 
 	/**
 	 * Creates and initiates a new synchronization
@@ -53,10 +50,10 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 	}
 
 	/**
-	 * @see ObjectSynchronization#run()
+	 * @see MetadataSynchronization#run()
 	 */
 	@Override
-	public void run() {
+	public SyncResult<T> run() {
 		MetadataDeployService deployService = Context.getService(MetadataDeployService.class);
 
 		initializeCache();
@@ -78,6 +75,8 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 		}
 
 		retireExistingNotInSource(deployService);
+
+		return result;
 	}
 
 	/**
@@ -121,7 +120,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 			keyCache.put(syncKey, incoming.getId());
 
 			log.info("Created new object '" + incoming.getName() + "' with sync key " + syncKey);
-			created.add(incoming);
+			result.getCreated().add(incoming);
 		}
 		else {
 			// Compute hashes of incoming and existing locations
@@ -133,7 +132,7 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 				deployService.overwriteObject(incoming, existing);
 
 				log.info("Updated existing object '" + existing.getName() + "' with sync key " + syncKey);
-				updated.add(existing);
+				result.getUpdated().add(existing);
 			}
 
 			notSyncedObjects.remove(existing.getId());
@@ -151,33 +150,9 @@ public abstract class AbstractMetadataSynchronization<T extends OpenmrsMetadata>
 				deployService.uninstallObject(notSynced, "Not found in sync source");
 
 				log.info("Retired existing object '" + notSynced.getName() + "'");
-				retired.add(notSynced);
+				result.getRetired().add(notSynced);
 			}
 		}
-	}
-
-	/**
-	 * @see ObjectSynchronization#getCreatedObjects()
-	 */
-	@Override
-	public List<T> getCreatedObjects() {
-		return created;
-	}
-
-	/**
-	 * @see ObjectSynchronization#getUpdatedObjects()
-	 */
-	@Override
-	public List<T> getUpdatedObjects() {
-		return updated;
-	}
-
-	/**
-	 * @see ObjectSynchronization#getRemovedObjects()
-	 */
-	@Override
-	public List<T> getRemovedObjects() {
-		return retired;
 	}
 
 	/**
