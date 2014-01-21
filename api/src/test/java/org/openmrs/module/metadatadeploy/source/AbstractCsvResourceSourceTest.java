@@ -33,11 +33,11 @@ public class AbstractCsvResourceSourceTest {
 
 		Location location1 = csvSource.fetchNext();
 		Assert.assertThat(location1.getName(), is("Location #1"));
-		Assert.assertThat(location1.getDescription(), is("Desc1"));
+		Assert.assertThat(location1.getDescription(), is("Testing"));
 
 		Location location2 = csvSource.fetchNext();
 		Assert.assertThat(location2.getName(), is("Location #2"));
-		Assert.assertThat(location2.getDescription(), is("Desc2"));
+		Assert.assertThat(location2.getDescription(), nullValue()); // Has empty description which should be converted to null
 
 		Location location3 = csvSource.fetchNext();
 		Assert.assertThat(location3.getName(), is("Location #3"));

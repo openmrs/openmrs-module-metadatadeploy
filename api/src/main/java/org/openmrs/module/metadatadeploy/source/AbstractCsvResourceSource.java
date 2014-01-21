@@ -56,11 +56,11 @@ public abstract class AbstractCsvResourceSource<T extends OpenmrsObject> impleme
 			return null;
 		}
 
-		// Replace blank values with nulls
+		// Trim values and replace blank or empty values with nulls
 		for (int c = 0; c < line.length; ++c) {
-			if (StringUtils.isBlank(line[c])) {
-				line[c] = null;
-			}
+			String val = line[c].trim();
+
+			line[c] = StringUtils.isNotEmpty(val) ? val : null;
 		}
 
 		return parseLine(line);
