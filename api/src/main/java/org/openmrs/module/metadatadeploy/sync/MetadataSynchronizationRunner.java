@@ -126,12 +126,8 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 			result.getCreated().add(incoming);
 		}
 		else {
-			// Compute hashes of incoming and existing locations
-			String incomingHash = sync.getObjectHash(incoming);
-			String existingHash = sync.getObjectHash(existing);
-
-			// Only update if hashes are different
-			if (!incomingHash.equals(existingHash)) {
+			// Only if incoming object differs
+			if (sync.updateRequired(incoming, existing)) {
 				deployService.overwriteObject(incoming, existing);
 
 				log.info("Updated existing object '" + existing.getName() + "' with sync key " + syncKey);

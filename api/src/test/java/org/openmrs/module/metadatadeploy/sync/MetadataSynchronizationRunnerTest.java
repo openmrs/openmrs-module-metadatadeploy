@@ -20,6 +20,7 @@ import org.openmrs.Location;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.metadatadeploy.source.AbstractCsvResourceSource;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -100,8 +101,11 @@ public class MetadataSynchronizationRunnerTest extends BaseModuleContextSensitiv
 		}
 
 		@Override
-		public String getObjectHash(Location obj) {
-			return obj.getName() + obj.getDescription();
+		public boolean updateRequired(Location incoming, Location existing) {
+			boolean objectsMatch = OpenmrsUtil.nullSafeEquals(incoming.getName(), existing.getName())
+				&& OpenmrsUtil.nullSafeEquals(incoming.getDescription(), existing.getDescription());
+
+			return !objectsMatch;
 		}
 	}
 }

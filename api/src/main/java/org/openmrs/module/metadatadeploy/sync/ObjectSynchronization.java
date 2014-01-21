@@ -44,9 +44,10 @@ public interface ObjectSynchronization<T extends OpenmrsObject> {
 	Object getObjectSyncKey(T obj);
 
 	/**
-	 * Gets the hash of the given object
-	 * @param obj the object
-	 * @return the hash
+	 * Compares two objects and returns true if an update is required because there are differences
+	 * @param incoming the incoming object
+	 * @param existing the existing object
+	 * @return true is there are differences
 	 */
-	String getObjectHash(T obj);
+	boolean updateRequired(T incoming, T existing);
 }
