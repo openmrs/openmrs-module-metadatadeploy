@@ -21,6 +21,7 @@ import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
@@ -152,6 +153,21 @@ public class CoreConstructors {
 		obj.setDatatypeConfig(datatypeConfig);
 		obj.setMinOccurs(minOccurs);
 		obj.setMaxOccurs(maxOccurs);
+		obj.setUuid(uuid);
+		return obj;
+	}
+
+	/**
+	 * Constructs a location tag
+	 * @param name the name
+	 * @param description the description
+	 * @param uuid the UUID
+	 * @return the location tag
+	 */
+	public static LocationTag locationTag(String name, String description, String uuid) {
+		LocationTag obj = new LocationTag();
+		obj.setName(name);
+		obj.setDescription(description);
 		obj.setUuid(uuid);
 		return obj;
 	}

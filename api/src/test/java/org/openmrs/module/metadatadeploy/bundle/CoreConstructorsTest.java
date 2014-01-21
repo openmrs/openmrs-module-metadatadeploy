@@ -22,6 +22,7 @@ import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Program;
@@ -167,6 +168,18 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeConfig(), is("config"));
 		Assert.assertThat(obj.getMinOccurs(), is(0));
 		Assert.assertThat(obj.getMaxOccurs(), is(1));
+		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
+	}
+
+	/**
+	 * @see CoreConstructors#locationTag(String, String, String)
+	 */
+	@Test
+	public void locationTag() {
+		LocationTag obj = CoreConstructors.locationTag("name", "desc", "obj-uuid");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getDescription(), is("desc"));
 		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
 	}
 
