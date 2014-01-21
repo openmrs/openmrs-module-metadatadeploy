@@ -22,6 +22,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
+import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
+import org.openmrs.module.metadatadeploy.sync.SyncResult;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +40,7 @@ import static org.hamcrest.Matchers.*;
 public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
-	private TestBundle testBundle;
+	private TestEmptyBundle emptyBundle;
 
 	/**
 	 * @see AbstractMetadataBundle#install(PackageDescriptor)
@@ -50,7 +52,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
 
 		PackageDescriptor pkg1 = new PackageDescriptor(TEST_PACKAGE_FILENAME, loader, TEST_PACKAGE_GROUP_UUID);
-		testBundle.install(pkg1);
+		emptyBundle.install(pkg1);
 
 		// Check contained visit type was installed
 		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
@@ -62,7 +64,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void install_shouldInstallAllObjectsFromSource() {
 		TestEncounterTypeSource source = new TestEncounterTypeSource();
-		List<EncounterType> installed = testBundle.install(source);
+		List<EncounterType> installed = emptyBundle.install(source);
 
 		EncounterType type1 = Context.getEncounterService().getEncounterType("name1");
 		EncounterType type2 = Context.getEncounterService().getEncounterType("name2");
@@ -80,16 +82,28 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		BrokenEncounterTypeSource source = new BrokenEncounterTypeSource();
 
 		try {
-			testBundle.install(source);
+			emptyBundle.install(source);
 			Assert.fail();
 		}
 		catch(APIException ex) {
 		}
 
-		// TODO figure out why this doesn't work. Does the test databae not support transactions?
+		// TODO figure out why this doesn't work. Does the test database not support transactions?
 
 		// Check the first item in the source is not installed (i.e. transaction was rolled back)
 		//Assert.assertThat(Context.getEncounterService().getEncounterType("name1"), nullValue());
+	}
+
+	/**
+	 * @see AbstractMetadataBundle#sync(org.openmrs.module.metadatadeploy.source.ObjectSource, org.openmrs.module.metadatadeploy.sync.ObjectSynchronization)
+	 */
+	@Test
+	public void sync_shouldRunSyncOperation() {
+		ObjectSource<EncounterType> source = new TestEncounterTypeSource();
+
+		SyncResult<EncounterType> result = emptyBundle.sync(source, new EncounterTypeSync());
+
+		Assert.assertThat(result.getCreated(), hasSize(2));
 	}
 
 	/**
@@ -98,11 +112,11 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void uninstall_shouldRemoveObjectIfItExists() {
 		// Fetch existing object
-		Form form = testBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
+		Form form = emptyBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
 		Assert.assertThat(form, is(notNullValue()));
 
 		// Check uninstall of existing object
-		testBundle.uninstall(form, "Testing");
+		emptyBundle.uninstall(form, "Testing");
 
 		Form retired = Context.getFormService().getFormByUuid("d9218f76-6c39-45f4-8efa-4c5c6c199f50");
 		Assert.assertThat(retired, is(notNullValue()));
@@ -112,7 +126,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(retired.getRetireReason(), is("Testing"));
 
 		// Check uninstall of null object (shouldn't do anything)
-		testBundle.uninstall(null, "Testing");
+		emptyBundle.uninstall(null, "Testing");
 	}
 
 	/**
@@ -121,13 +135,13 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void existing_shouldFetchExistingObject() {
 		// Check valid object
-		Form form1 = testBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
+		Form form1 = emptyBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
 		Assert.assertThat(form1, is(notNullValue()));
 		Assert.assertThat(form1.getName(), is("Basic Form"));
 		Assert.assertThat(form1.getUuid(), is("d9218f76-6c39-45f4-8efa-4c5c6c199f50"));
 
 		// Check invalid object
-		Form form2 = testBundle.existing(Form.class, "xxxxxxxx");
+		Form form2 = emptyBundle.existing(Form.class, "xxxxxxxx");
 		Assert.assertThat(form2, is(nullValue()));
 	}
 
@@ -135,7 +149,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	 * Bundle for testing
 	 */
 	@Component
-	public static class TestBundle extends AbstractMetadataBundle {
+	public static class TestEmptyBundle extends AbstractMetadataBundle {
 		@Override
 		public void install() {
 		}
@@ -174,6 +188,29 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 
 			}
 			throw new NullPointerException();
+		}
+	}
+
+	public static class EncounterTypeSync implements ObjectSynchronization<EncounterType> {
+
+		@Override
+		public List<EncounterType> fetchAllExisting() {
+			return Context.getEncounterService().getAllEncounterTypes(true);
+		}
+
+		@Override
+		public EncounterType fetchExistingById(int id) {
+			return Context.getEncounterService().getEncounterType(id);
+		}
+
+		@Override
+		public Object getObjectSyncKey(EncounterType obj) {
+			return obj.getName();
+		}
+
+		@Override
+		public boolean updateRequired(EncounterType incoming, EncounterType existing) {
+			return true;
 		}
 	}
 }
