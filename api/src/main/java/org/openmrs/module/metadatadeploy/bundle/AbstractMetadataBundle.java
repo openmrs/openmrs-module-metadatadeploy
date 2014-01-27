@@ -81,7 +81,7 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @return the synchronization result
 	 */
 	protected <T extends OpenmrsMetadata> SyncResult<T> sync(ObjectSource<T> source, ObjectSynchronization<T> sync) {
-		MetadataSynchronizationRunner runner = new MetadataSynchronizationRunner(source, sync);
+		MetadataSynchronizationRunner<T> runner = new MetadataSynchronizationRunner<T>(source, sync);
 		return runner.run();
 	}
 

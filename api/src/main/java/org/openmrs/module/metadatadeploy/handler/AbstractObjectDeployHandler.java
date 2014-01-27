@@ -23,6 +23,9 @@ import org.openmrs.module.metadatadeploy.ObjectUtils;
 public abstract class AbstractObjectDeployHandler<T extends OpenmrsObject> implements ObjectDeployHandler<T> {
 
 	/**
+	 * Generally objects are identified by their UUID. Roles, Privileges and Global Properties are exceptions because
+	 * they can be globally identified by their name.
+	 *
 	 * @see ObjectDeployHandler#getIdentifier(org.openmrs.OpenmrsObject)
 	 */
 	@Override
