@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
@@ -44,6 +45,22 @@ import java.util.UUID;
  * Constructors for different core metadata classes
  */
 public class CoreConstructors {
+
+	/**
+	 * Constructs an encounter role
+	 * @param name the name
+	 * @param description the description
+	 * @param uuid the UUID
+	 * @return the encounter role
+	 */
+	public static EncounterRole encounterRole(String name, String description, String uuid) {
+		EncounterRole obj = new EncounterRole();
+		obj.setName(name);
+		obj.setDescription(description);
+		obj.setUuid(uuid);
+
+		return obj;
+	}
 
 	/**
 	 * Constructs an encounter type

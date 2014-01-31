@@ -17,6 +17,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
@@ -45,6 +46,18 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void integration() {
 		new CoreConstructors();
+	}
+
+	/**
+	 * @see CoreConstructors#encounterRole(String, String, String)
+	 */
+	@Test
+	public void encounterRole() {
+		EncounterRole obj = CoreConstructors.encounterRole("name", "desc", "obj-uuid");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getDescription(), is("desc"));
+		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
 	}
 
 	/**
