@@ -56,11 +56,11 @@ public class FormDeployHandler extends AbstractObjectDeployHandler<Form> {
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(Form obj, String reason) {
+	public void uninstall(Form obj, String reason) {
 		formService.retireForm(obj, reason);
 	}
 }

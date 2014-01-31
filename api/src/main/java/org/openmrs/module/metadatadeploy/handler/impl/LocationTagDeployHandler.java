@@ -48,10 +48,10 @@ public class LocationTagDeployHandler extends AbstractObjectDeployHandler<Locati
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
 	 */
 	@Override
-	public void remove(LocationTag obj, String reason) {
+	public void uninstall(LocationTag obj, String reason) {
 		locationService.purgeLocationTag(obj);
 	}
 }

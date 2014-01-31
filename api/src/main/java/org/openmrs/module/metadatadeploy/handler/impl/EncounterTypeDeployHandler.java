@@ -56,11 +56,11 @@ public class EncounterTypeDeployHandler extends AbstractObjectDeployHandler<Enco
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(EncounterType obj, String reason) {
+	public void uninstall(EncounterType obj, String reason) {
 		encounterService.retireEncounterType(obj, reason);
 	}
 }

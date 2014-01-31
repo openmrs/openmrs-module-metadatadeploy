@@ -48,11 +48,11 @@ public class LocationAttributeTypeDeployHandler extends AbstractObjectDeployHand
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(LocationAttributeType obj, String reason) {
+	public void uninstall(LocationAttributeType obj, String reason) {
 		locationService.retireLocationAttributeType(obj, reason);
 	}
 }

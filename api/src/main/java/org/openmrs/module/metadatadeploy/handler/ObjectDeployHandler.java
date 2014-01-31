@@ -51,10 +51,10 @@ public interface ObjectDeployHandler<T extends OpenmrsObject> {
 
 	/**
 	 * Removes the given object which may be implemented as a void, retire or purge depending on the object
-	 * @param obj the object to remove
+	 * @param obj the object to uninstall
 	 * @param reason the reason for removal
 	 */
-	void remove(T obj, String reason);
+	void uninstall(T obj, String reason);
 
 	/**
 	 * Overwrites the existing object with the incoming object

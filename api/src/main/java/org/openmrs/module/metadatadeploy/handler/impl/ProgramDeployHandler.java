@@ -67,11 +67,11 @@ public class ProgramDeployHandler extends AbstractObjectDeployHandler<Program> {
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(Program obj, String reason) {
+	public void uninstall(Program obj, String reason) {
 		// Because of TRUNK-4160, we can't just call retireProgram
 		obj.setRetired(true);
 		obj.setRetiredBy(Context.getAuthenticatedUser());

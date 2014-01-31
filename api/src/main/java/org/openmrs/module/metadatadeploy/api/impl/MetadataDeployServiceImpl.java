@@ -224,7 +224,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	public <T extends OpenmrsObject> void uninstallObject(T outgoing, String reason) {
 		ObjectDeployHandler<T> handler = getHandler(outgoing);
 
-		handler.remove(outgoing, reason);
+		handler.uninstall(outgoing, reason);
 	}
 
 	/**

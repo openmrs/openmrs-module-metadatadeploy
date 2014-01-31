@@ -48,11 +48,11 @@ public class VisitAttributeTypeDeployHandler extends AbstractObjectDeployHandler
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(VisitAttributeType obj, String reason) {
+	public void uninstall(VisitAttributeType obj, String reason) {
 		visitService.retireVisitAttributeType(obj, reason);
 	}
 }

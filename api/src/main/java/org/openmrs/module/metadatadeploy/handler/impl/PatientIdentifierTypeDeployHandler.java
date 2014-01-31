@@ -56,11 +56,11 @@ public class PatientIdentifierTypeDeployHandler extends AbstractObjectDeployHand
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(PatientIdentifierType obj, String reason) {
+	public void uninstall(PatientIdentifierType obj, String reason) {
 		patientService.retirePatientIdentifierType(obj, reason);
 	}
 }

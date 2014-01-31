@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.customdatatype.SingleCustomValue;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,11 +66,11 @@ public class GlobalPropertyDeployHandler extends AbstractObjectDeployHandler<Glo
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#remove(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to remove
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
+	 * @param obj the object to uninstall
 	 */
 	@Override
-	public void remove(GlobalProperty obj, String reason) {
+	public void uninstall(GlobalProperty obj, String reason) {
 		adminService.purgeGlobalProperty(obj);
 	}
 
