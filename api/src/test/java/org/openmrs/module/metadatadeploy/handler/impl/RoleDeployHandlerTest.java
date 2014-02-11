@@ -17,16 +17,18 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.hibernate.FlushMode;
 import org.hibernate.SessionFactory;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.privilege;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.role;
@@ -66,7 +68,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(created.getPrivileges(), containsInAnyOrder(privilege4));
 
 		// Check updating existing
-		deployService.installObject(role("Role3", "Updated desc", idSet("Role2"), null)); // No longer inherits Role1
+		Role role3b = deployService.installObject(role("Role3", "Updated desc", idSet("Role2"), null)); // No longer inherits Role1
 
 		// Check everything can be persisted
 		Context.flushSession();
@@ -99,11 +101,10 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	 * once we stopped needlessly overwriting UUIDs the problem was fixed.
 	 */
 	@Test
-	public void integration_shouldWorkWithoutFlushes() throws Exception {
+	public void integration_shouldWorkWithoutFlushes() {
 		sessionFactory.getCurrentSession().setFlushMode(FlushMode.MANUAL);
 
 		deployService.installObject(privilege("Privilege1", "Testing"));
-
 		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
 		deployService.installObject(role("Role2", "Testing", idSet("Role1"), null));
 
@@ -113,5 +114,32 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 		Context.flushSession();
 		sessionFactory.getCurrentSession().setFlushMode(FlushMode.AUTO);
+	}
+
+	/**
+	 * Replicates DPLY-1: Overwriting of existing roles can lose inherited roles
+	 */
+	@Test
+	public void integration_shouldNotLoseInheritedRoles() throws Exception {
+		deployService.installObject(role("Role1", "Testing", null, null));
+		deployService.installObject(role("Role2", "Testing", idSet("Role1"), null));
+
+		Context.flushSession();
+		Context.clearSession();
+
+		//TestUtil.printOutTableContents(getConnection(), "role_role");
+
+		deployService.installObject(role("Role1", "Testing", null, null));
+		deployService.installObject(role("Role2", "Testing", idSet("Role1"), null));
+
+		Context.flushSession();
+		Context.clearSession();
+
+		//TestUtil.printOutTableContents(getConnection(), "role_role");
+
+		Role role1 = MetadataUtils.getRole("Role1");
+		Role role2 = MetadataUtils.getRole("Role2");
+
+		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
 	}
 }

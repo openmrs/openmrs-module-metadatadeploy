@@ -22,7 +22,8 @@ import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Deployment handler for roles
@@ -81,6 +82,6 @@ public class RoleDeployHandler extends AbstractObjectDeployHandler<Role> {
 	@Override
 	public void overwrite(Role incoming, Role existing) {
 		// Do per-field copy of incoming to existing, excluding UUID
-		ObjectUtils.overwrite(incoming, existing, Collections.singleton("uuid"));
+		ObjectUtils.overwrite(incoming, existing, new HashSet<String>(Arrays.asList("childRoles", "uuid")));
 	}
 }

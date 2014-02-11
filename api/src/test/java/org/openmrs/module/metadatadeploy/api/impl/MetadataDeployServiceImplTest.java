@@ -16,15 +16,11 @@ package org.openmrs.module.metadatadeploy.api.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
-import org.openmrs.ProgramWorkflow;
-import org.openmrs.ProgramWorkflowState;
 import org.openmrs.Role;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -33,7 +29,6 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
-import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
 import org.openmrs.module.metadatadeploy.handler.impl.ProgramDeployHandler;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.aop.framework.Advised;
@@ -41,11 +36,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
@@ -77,18 +68,17 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	public void installBundles() {
 		deployService.installBundles(Arrays.<MetadataBundle>asList(testBundle3, testBundle2, testBundle1));
 
-		Privilege privilege1 = Context.getUserService().getPrivilege("Test Privilege 1");
-		Privilege privilege2 = Context.getUserService().getPrivilege("Test Privilege 2");
+		Privilege privilege1 = MetadataUtils.getPrivilege("Test Privilege 1");
+		Privilege privilege2 = MetadataUtils.getPrivilege("Test Privilege 2");
+		Role role1 = MetadataUtils.getRole("Test Role 1");
+		Role role2 = MetadataUtils.getRole("Test Role 2");
 
-		Assert.assertThat(privilege1, is(notNullValue()));
-		Assert.assertThat(privilege2, is(notNullValue()));
-		Assert.assertThat(Context.getUserService().getRole("Test Role 1"), is(notNullValue()));
-		Assert.assertThat(Context.getUserService().getRole("Test Role 2"), is(notNullValue()));
-		//Assert.assertThat(Context.getUserService().getRole("Test Role 2").getPrivileges(), contains(privilege1, privilege2));
+		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
+		Assert.assertThat(role2.getPrivileges(), contains(privilege1, privilege2));
 
-		Assert.assertThat(Context.getEncounterService().getEncounterTypeByUuid(uuid("enc-type-uuid")), is(notNullValue()));
-		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form1-uuid")), is(notNullValue()));
-		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form2-uuid")), is(notNullValue()));
+		Assert.assertThat(Context.getEncounterService().getEncounterTypeByUuid(uuid("enc-type-uuid")), notNullValue());
+		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form1-uuid")), notNullValue());
+		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form2-uuid")), notNullValue());
 	}
 
 	/**
@@ -128,11 +118,11 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 
 		// Simulate first time startup
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(true));
-		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 
 		// Simulate starting a second time
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(false));
-		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 	}
 
 	/**
