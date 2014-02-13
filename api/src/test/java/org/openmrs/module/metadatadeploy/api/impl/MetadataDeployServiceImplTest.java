@@ -74,7 +74,8 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		Role role2 = MetadataUtils.getRole("Test Role 2");
 
 		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
-		Assert.assertThat(role2.getPrivileges(), contains(privilege1, privilege2));
+
+		Assert.assertThat(role2.getPrivileges(), containsInAnyOrder(privilege1, privilege2));
 
 		Assert.assertThat(Context.getEncounterService().getEncounterTypeByUuid(uuid("enc-type-uuid")), notNullValue());
 		Assert.assertThat(Context.getFormService().getFormByUuid(uuid("form1-uuid")), notNullValue());
