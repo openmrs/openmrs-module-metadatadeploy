@@ -86,11 +86,27 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	}
 
 	/**
-	 * Fetches an existing object if it exists
+	 * Fetches a possibly existing object (non fail-fast)
 	 * @param clazz the object's class
-	 * @param uuid the object's UUID
+	 * @param identifier the object's identifier
+	 * @return the object or null
 	 */
-	protected <T extends OpenmrsObject> T existing(Class<T> clazz, String uuid) {
-		return deployService.fetchObject(clazz, uuid);
+	protected <T extends OpenmrsObject> T possible(Class<T> clazz, String identifier) {
+		return deployService.fetchObject(clazz, identifier);
+	}
+
+	/**
+	 * Fetches an existing object (fail-fast)
+	 * @param clazz the object's class
+	 * @param identifier the object's identifier
+	 * @return the object
+	 * @throws IllegalArgumentException if object doesn't exist
+	 */
+	protected <T extends OpenmrsObject> T existing(Class<T> clazz, String identifier) throws IllegalArgumentException {
+		T obj = deployService.fetchObject(clazz, identifier);
+		if (obj == null) {
+			throw new IllegalArgumentException("No such " + clazz.getSimpleName() + " with identifier " + identifier);
+		}
+		return obj;
 	}
 }

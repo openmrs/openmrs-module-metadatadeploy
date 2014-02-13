@@ -130,19 +130,42 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
+	 * @see AbstractMetadataBundle#possible(Class, String)
+	 */
+	@Test
+	public void possible_shouldFetchExistingObject() {
+		Form form1 = emptyBundle.possible(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
+		Assert.assertThat(form1, notNullValue());
+		Assert.assertThat(form1.getName(), is("Basic Form"));
+		Assert.assertThat(form1.getUuid(), is("d9218f76-6c39-45f4-8efa-4c5c6c199f50"));
+	}
+
+	/**
+	 * @see AbstractMetadataBundle#possible(Class, String)
+	 */
+	@Test
+	public void possible_shouldReturnNullForNonExisting() {
+		Assert.assertThat(emptyBundle.possible(Form.class, "xxxxxxxx"), nullValue());
+	}
+
+	/**
 	 * @see AbstractMetadataBundle#existing(Class, String)
 	 */
 	@Test
 	public void existing_shouldFetchExistingObject() {
 		// Check valid object
 		Form form1 = emptyBundle.existing(Form.class, "d9218f76-6c39-45f4-8efa-4c5c6c199f50");
-		Assert.assertThat(form1, is(notNullValue()));
+		Assert.assertThat(form1, notNullValue());
 		Assert.assertThat(form1.getName(), is("Basic Form"));
 		Assert.assertThat(form1.getUuid(), is("d9218f76-6c39-45f4-8efa-4c5c6c199f50"));
+	}
 
-		// Check invalid object
+	/**
+	 * @see AbstractMetadataBundle#existing(Class, String)
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void existing_shouldThrowExceptionForNonExisting() {
 		Form form2 = emptyBundle.existing(Form.class, "xxxxxxxx");
-		Assert.assertThat(form2, is(nullValue()));
 	}
 
 	/**
