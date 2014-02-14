@@ -72,10 +72,10 @@ public interface MetadataDeployService {
 	/**
 	 * Fetches an existing object if it exists
 	 * @param clazz the object's class
-	 * @param uuid the object's UUID
+	 * @param identifier the object's identifier
 	 */
 	@Transactional(readOnly = true)
-	<T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid);
+	<T extends OpenmrsObject> T fetchObject(Class<T> clazz, String identifier);
 
 	/**
 	 * Saves the given object

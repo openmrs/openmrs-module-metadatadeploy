@@ -21,6 +21,7 @@ import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
@@ -31,6 +32,7 @@ import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.VisitType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 
 /**
  * Utility methods for fail-fast fetching of metadata
@@ -92,11 +94,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such encounter type exists
 	 */
 	public static EncounterType getEncounterType(String uuid) {
-		EncounterType ret = Context.getEncounterService().getEncounterTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(EncounterType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(EncounterType.class, uuid);
 	}
 
 	/**
@@ -106,11 +104,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such form exists
 	 */
 	public static Form getForm(String uuid) {
-		Form ret = Context.getFormService().getFormByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(Form.class, uuid);
-		}
-		return ret;
+		return fetchExisting(Form.class, uuid);
 	}
 
 	/**
@@ -120,11 +114,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such location exists
 	 */
 	public static Location getLocation(String uuid) {
-		Location ret = Context.getLocationService().getLocationByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(Location.class, uuid);
-		}
-		return ret;
+		return fetchExisting(Location.class, uuid);
 	}
 
 	/**
@@ -134,11 +124,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such location attribute type exists
 	 */
 	public static LocationAttributeType getLocationAttributeType(String uuid) {
-		LocationAttributeType ret = Context.getLocationService().getLocationAttributeTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(LocationAttributeType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(LocationAttributeType.class, uuid);
 	}
 
 	/**
@@ -148,11 +134,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such patient identifier type exists
 	 */
 	public static PatientIdentifierType getPatientIdentifierType(String uuid) {
-		PatientIdentifierType ret = Context.getPatientService().getPatientIdentifierTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(PatientIdentifierType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(PatientIdentifierType.class, uuid);
 	}
 
 	/**
@@ -162,11 +144,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such person attribute type exists
 	 */
 	public static PersonAttributeType getPersonAttributeType(String uuid) {
-		PersonAttributeType ret = Context.getPersonService().getPersonAttributeTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(PersonAttributeType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(PersonAttributeType.class, uuid);
 	}
 
 	/**
@@ -197,11 +175,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such program exists
 	 */
 	public static Program getProgram(String uuid) {
-		Program ret = Context.getProgramWorkflowService().getProgramByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(Program.class, uuid);
-		}
-		return ret;
+		return fetchExisting(Program.class, uuid);
 	}
 
 	/**
@@ -211,11 +185,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
 	public static ProviderAttributeType getProviderAttributeType(String uuid) {
-		ProviderAttributeType ret = Context.getProviderService().getProviderAttributeTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(ProviderAttributeType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(ProviderAttributeType.class, uuid);
 	}
 
 	/**
@@ -225,11 +195,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such relationship type exists
 	 */
 	public static RelationshipType getRelationshipType(String uuid) {
-		RelationshipType ret = Context.getPersonService().getRelationshipTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(RelationshipType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(RelationshipType.class, uuid);
 	}
 
 	/**
@@ -260,11 +226,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
 	public static VisitAttributeType getVisitAttributeType(String uuid) {
-		VisitAttributeType ret = Context.getVisitService().getVisitAttributeTypeByUuid(uuid);
-		if (ret == null) {
-			throw new MissingMetadataException(VisitAttributeType.class, uuid);
-		}
-		return ret;
+		return fetchExisting(VisitAttributeType.class, uuid);
 	}
 
 	/**
@@ -274,9 +236,20 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit type exists
 	 */
 	public static VisitType getVisitType(String uuid) {
-		VisitType ret = Context.getVisitService().getVisitTypeByUuid(uuid);
+		return fetchExisting(VisitType.class, uuid);
+	}
+
+	/**
+	 * Fetches an object which is assumed to exist
+	 * @param clazz the object class
+	 * @param identifier the object identifier
+	 * @return the object
+	 * @throws org.openmrs.module.metadatadeploy.MissingMetadataException if object doesn't exist
+	 */
+	protected static <T extends OpenmrsObject> T fetchExisting(Class<T> clazz, String identifier) {
+		T ret = Context.getService(MetadataDeployService.class).fetchObject(clazz, identifier);
 		if (ret == null) {
-			throw new MissingMetadataException(VisitType.class, uuid);
+			throw new MissingMetadataException(VisitType.class, identifier);
 		}
 		return ret;
 	}

@@ -231,9 +231,9 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @see MetadataDeployService#fetchObject(Class, String)
 	 */
 	@Override
-	public <T extends OpenmrsObject> T fetchObject(Class<T> clazz, String uuid) {
+	public <T extends OpenmrsObject> T fetchObject(Class<T> clazz, String identifier) {
 		ObjectDeployHandler<T> handler = getHandler(clazz);
-		return handler.fetch(uuid);
+		return handler.fetch(identifier);
 	}
 
 	/**
