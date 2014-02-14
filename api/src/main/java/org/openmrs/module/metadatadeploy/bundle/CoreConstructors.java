@@ -27,6 +27,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.ProviderAttributeType;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
@@ -160,7 +161,7 @@ public class CoreConstructors {
 	 * @param minOccurs the minimum allowed occurrences
 	 * @param maxOccurs the maximum allowed occurrences
 	 * @param uuid the UUID
-	 * @return the program
+	 * @return the location attribute type
 	 */
 	public static LocationAttributeType locationAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
 		LocationAttributeType obj = new LocationAttributeType();
@@ -285,6 +286,29 @@ public class CoreConstructors {
 		obj.setName(name);
 		obj.setDescription(description);
 		obj.setConcept(MetadataUtils.getConcept(concept));
+		obj.setUuid(uuid);
+		return obj;
+	}
+
+	/**
+	 * Constructs a provider attribute type
+	 * @param name the name
+	 * @param description the description
+	 * @param datatype the datatype class
+	 * @param datatypeConfig the data type config (can be null)
+	 * @param minOccurs the minimum allowed occurrences
+	 * @param maxOccurs the maximum allowed occurrences
+	 * @param uuid the UUID
+	 * @return the provider attribute type
+	 */
+	public static ProviderAttributeType providerAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
+		ProviderAttributeType obj = new ProviderAttributeType();
+		obj.setName(name);
+		obj.setDescription(description);
+		obj.setDatatypeClassname(datatype.getName());
+		obj.setDatatypeConfig(datatypeConfig);
+		obj.setMinOccurs(minOccurs);
+		obj.setMaxOccurs(maxOccurs);
 		obj.setUuid(uuid);
 		return obj;
 	}
