@@ -27,6 +27,7 @@ import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Program;
+import org.openmrs.ProviderAttributeType;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.VisitType;
 import org.openmrs.api.context.Context;
@@ -254,6 +255,22 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getName(), is("name"));
 		Assert.assertThat(obj.getDescription(), is("desc"));
 		Assert.assertThat(obj.getConcept(), is(Context.getConceptService().getConceptByUuid(HIV_PROGRAM_UUID)));
+		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
+	}
+
+	/**
+	 * @see CoreConstructors#providerAttributeType(String, String, Class, String, int, int, String)
+	 */
+	@Test
+	public void providerAttributeType() {
+		ProviderAttributeType obj = CoreConstructors.providerAttributeType("name", "desc", TestingDatatype.class, "config", 0, 1, "obj-uuid");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getDescription(), is("desc"));
+		Assert.assertThat(obj.getDatatypeClassname(), is(TestingDatatype.class.getName()));
+		Assert.assertThat(obj.getDatatypeConfig(), is("config"));
+		Assert.assertThat(obj.getMinOccurs(), is(0));
+		Assert.assertThat(obj.getMaxOccurs(), is(1));
 		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
 	}
 

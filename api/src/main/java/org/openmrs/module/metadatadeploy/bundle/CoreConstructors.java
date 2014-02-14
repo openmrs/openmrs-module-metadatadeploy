@@ -195,7 +195,7 @@ public class CoreConstructors {
 	 * @param filename the name
 	 * @param classLoader the description
 	 * @param groupUuid the group UUID
-	 * @return the visit type
+	 * @return the package descriptor
 	 */
 	public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid) {
 		return new PackageDescriptor(filename, classLoader, groupUuid);
@@ -207,7 +207,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param format the format regex
 	 * @param uuid the UUID
-	 * @return the program
+	 * @return the patient identifier type
 	 */
 	public static PatientIdentifierType patientIdentifierType(String name,
 													   String description,
@@ -239,7 +239,7 @@ public class CoreConstructors {
 	 * @param searchable whether attribute is searchable
 	 * @param sortWeight the sort weight
 	 * @param uuid the UUID
-	 * @return the program
+	 * @return the person attribute type
 	 */
 	public static PersonAttributeType personAttributeType(String name,
 												   String description,
@@ -319,7 +319,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param inherited the inherited roles
 	 * @param privileges the privileges
-	 * @return the program
+	 * @return the role
 	 */
 	public static Role role(String role, String description, Set<String> inherited, Set<String> privileges) {
 		Role obj = new Role();
@@ -355,7 +355,7 @@ public class CoreConstructors {
 	 * @param minOccurs the minimum allowed occurrences
 	 * @param maxOccurs the maximum allowed occurrences
 	 * @param uuid the UUID
-	 * @return the program
+	 * @return the visit attribute type
 	 */
 	public static VisitAttributeType visitAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
 		VisitAttributeType obj = new VisitAttributeType();
