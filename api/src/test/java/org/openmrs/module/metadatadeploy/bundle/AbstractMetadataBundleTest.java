@@ -21,6 +21,7 @@ import org.openmrs.Form;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
 import org.openmrs.module.metadatadeploy.sync.SyncResult;
@@ -163,7 +164,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see AbstractMetadataBundle#existing(Class, String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void existing_shouldThrowExceptionForNonExisting() {
 		Form form2 = emptyBundle.existing(Form.class, "xxxxxxxx");
 	}

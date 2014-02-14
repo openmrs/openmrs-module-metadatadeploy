@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.openmrs.OpenmrsMetadata;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
@@ -100,12 +101,12 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param clazz the object's class
 	 * @param identifier the object's identifier
 	 * @return the object
-	 * @throws IllegalArgumentException if object doesn't exist
+	 * @throws org.openmrs.module.metadatadeploy.MissingMetadataException if object doesn't exist
 	 */
-	protected <T extends OpenmrsObject> T existing(Class<T> clazz, String identifier) throws IllegalArgumentException {
+	protected <T extends OpenmrsObject> T existing(Class<T> clazz, String identifier) {
 		T obj = deployService.fetchObject(clazz, identifier);
 		if (obj == null) {
-			throw new IllegalArgumentException("No such " + clazz.getSimpleName() + " with identifier " + identifier);
+			throw new MissingMetadataException(clazz, identifier);
 		}
 		return obj;
 	}

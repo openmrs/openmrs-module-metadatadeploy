@@ -25,6 +25,7 @@ import org.openmrs.Role;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
@@ -112,7 +113,7 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 			MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c");
 			Assert.fail();
 		}
-		catch (IllegalArgumentException ex) {
+		catch (MissingMetadataException ex) {
 		}
 
 		ClassLoader classLoader = getClass().getClassLoader();

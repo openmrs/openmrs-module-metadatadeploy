@@ -27,6 +27,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.ProviderAttributeType;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
@@ -76,7 +77,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getConcept(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getConcept_shouldThrowExceptionForNonExistentMapping() {
 		MetadataUtils.getConcept("SSTRM:XXXXXX");
 	}
@@ -84,7 +85,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getConcept(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getConcept_shouldThrowExceptionForNonExistentUuid() {
 		MetadataUtils.getConcept(NONEXISTENT_UUID);
 	}
@@ -92,7 +93,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getConcept(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getConcept_shouldThrowExceptionForNumericConceptWithNoConceptNumeric() {
 		MetadataUtils.getConcept("11716f9c-1434-4f8d-b9fc-9aa14c4d6129");
 	}
@@ -109,7 +110,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getDrug(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getDrug_shouldThrowExceptionForNonExistentUuid() {
 		MetadataUtils.getDrug(NONEXISTENT_UUID);
 	}
@@ -126,7 +127,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getEncounterType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getEncounterType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getEncounterType(NONEXISTENT_UUID);
 	}
@@ -143,7 +144,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getForm(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getForm_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getForm(NONEXISTENT_UUID);
 	}
@@ -160,7 +161,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getLocation(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getLocation_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getLocation(NONEXISTENT_UUID);
 	}
@@ -185,7 +186,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getLocationAttributeType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getLocationAttributeType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getLocationAttributeType(NONEXISTENT_UUID);
 	}
@@ -202,7 +203,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getPatientIdentifierType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getPatientIdentifierType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getPatientIdentifierType(NONEXISTENT_UUID);
 	}
@@ -219,7 +220,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getPersonAttributeType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getPersonAttributeType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getPersonAttributeType(NONEXISTENT_UUID);
 	}
@@ -241,7 +242,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getPrivilege(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getPrivilege_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getPrivilege(NONEXISTENT_UUID);
 	}
@@ -258,9 +259,34 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getProgram(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getProgram_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getProgram(NONEXISTENT_UUID);
+	}
+
+	/**
+	 * @see MetadataUtils#getProviderAttributeType(String)
+	 */
+	@Test
+	public void getProviderAttributeType_shouldFetchByUuid() {
+		// No provider attribute type in the standard test data so make one..
+		ProviderAttributeType phoneAttrType = new ProviderAttributeType();
+		phoneAttrType.setName("Provider Phone");
+		phoneAttrType.setMinOccurs(0);
+		phoneAttrType.setMaxOccurs(1);
+		phoneAttrType.setDatatypeClassname("org.openmrs.customdatatype.datatype.FreeTextDatatype");
+		Context.getProviderService().saveProviderAttributeType(phoneAttrType);
+		String savedUuid = phoneAttrType.getUuid();
+
+		Assert.assertThat(MetadataUtils.getProviderAttributeType(savedUuid), is(phoneAttrType));
+	}
+
+	/**
+	 * @see MetadataUtils#getProviderAttributeType(String)
+	 */
+	@Test(expected = MissingMetadataException.class)
+	public void getProviderAttributeType_shouldThrowExceptionForNonExistent() {
+		MetadataUtils.getProviderAttributeType(NONEXISTENT_UUID);
 	}
 
 	/**
@@ -275,7 +301,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getRelationshipType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getRelationshipType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getRelationshipType(NONEXISTENT_UUID);
 	}
@@ -293,7 +319,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getRole(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getRole_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getRole(NONEXISTENT_UUID);
 	}
@@ -310,7 +336,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getVisitAttributeType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getVisitAttributeType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getVisitAttributeType(NONEXISTENT_UUID);
 	}
@@ -326,7 +352,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @see MetadataUtils#getVisitType(String)
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = MissingMetadataException.class)
 	public void getVisitType_shouldThrowExceptionForNonExistent() {
 		MetadataUtils.getVisitType(NONEXISTENT_UUID);
 	}

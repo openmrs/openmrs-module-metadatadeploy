@@ -25,6 +25,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.ProviderAttributeType;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
@@ -40,7 +41,7 @@ public class MetadataUtils {
 	 * Gets the specified concept (by mapping or UUID)
 	 * @param identifier the mapping or UUID
 	 * @return the concept
-	 * @throws IllegalArgumentException if no such concept exists
+	 * @throws MissingMetadataException if no such concept exists
 	 */
 	public static Concept getConcept(String identifier) {
 		Concept concept;
@@ -55,7 +56,7 @@ public class MetadataUtils {
 		}
 
 		if (concept == null) {
-			throw new IllegalArgumentException("No concept with identifier '" + identifier + "'");
+			throw new MissingMetadataException(Concept.class, identifier);
 		}
 
 		// getConcept doesn't always return ConceptNumeric for numeric concepts
@@ -63,7 +64,7 @@ public class MetadataUtils {
 			concept = Context.getConceptService().getConceptNumeric(concept.getId());
 
 			if (concept == null) {
-				throw new IllegalArgumentException("Unable to load numeric concept for '" + identifier + "'");
+				throw new MissingMetadataException(ConceptNumeric.class, identifier);
 			}
 		}
 
@@ -74,12 +75,12 @@ public class MetadataUtils {
 	 * Gets the specified drug
 	 * @param uuid the uuid
 	 * @return the drug
-	 * @throws IllegalArgumentException if no such drug exists
+	 * @throws MissingMetadataException if no such drug exists
 	 */
 	public static Drug getDrug(String uuid) {
 		Drug ret = Context.getConceptService().getDrugByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such drug with identifier " + uuid);
+			throw new MissingMetadataException(Drug.class, uuid);
 		}
 		return ret;
 	}
@@ -88,12 +89,12 @@ public class MetadataUtils {
 	 * Gets the specified encounter type
 	 * @param uuid the uuid
 	 * @return the encounter type
-	 * @throws IllegalArgumentException if no such encounter type exists
+	 * @throws MissingMetadataException if no such encounter type exists
 	 */
 	public static EncounterType getEncounterType(String uuid) {
 		EncounterType ret = Context.getEncounterService().getEncounterTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such encounter type with identifier " + uuid);
+			throw new MissingMetadataException(EncounterType.class, uuid);
 		}
 		return ret;
 	}
@@ -102,12 +103,12 @@ public class MetadataUtils {
 	 * Gets the specified form
 	 * @param uuid the uuid
 	 * @return the form
-	 * @throws IllegalArgumentException if no such form exists
+	 * @throws MissingMetadataException if no such form exists
 	 */
 	public static Form getForm(String uuid) {
 		Form ret = Context.getFormService().getFormByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such form with identifier " + uuid);
+			throw new MissingMetadataException(Form.class, uuid);
 		}
 		return ret;
 	}
@@ -116,12 +117,12 @@ public class MetadataUtils {
 	 * Gets the specified location
 	 * @param uuid the identifier
 	 * @return the location
-	 * @throws IllegalArgumentException if no such location exists
+	 * @throws MissingMetadataException if no such location exists
 	 */
 	public static Location getLocation(String uuid) {
 		Location ret = Context.getLocationService().getLocationByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such location with identifier " + uuid);
+			throw new MissingMetadataException(Location.class, uuid);
 		}
 		return ret;
 	}
@@ -130,12 +131,12 @@ public class MetadataUtils {
 	 * Gets the specified location attribute type
 	 * @param uuid the uuid
 	 * @return the location attribute type
-	 * @throws IllegalArgumentException if no such location attribute type exists
+	 * @throws MissingMetadataException if no such location attribute type exists
 	 */
 	public static LocationAttributeType getLocationAttributeType(String uuid) {
 		LocationAttributeType ret = Context.getLocationService().getLocationAttributeTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such location attribute type with identifier " + uuid);
+			throw new MissingMetadataException(LocationAttributeType.class, uuid);
 		}
 		return ret;
 	}
@@ -144,12 +145,12 @@ public class MetadataUtils {
 	 * Gets the specified patient identifier type
 	 * @param uuid the uuid
 	 * @return the patient identifier type
-	 * @throws IllegalArgumentException if no such patient identifier type exists
+	 * @throws MissingMetadataException if no such patient identifier type exists
 	 */
 	public static PatientIdentifierType getPatientIdentifierType(String uuid) {
 		PatientIdentifierType ret = Context.getPatientService().getPatientIdentifierTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such patient identifier type with identifier " + uuid);
+			throw new MissingMetadataException(PatientIdentifierType.class, uuid);
 		}
 		return ret;
 	}
@@ -158,12 +159,12 @@ public class MetadataUtils {
 	 * Gets the specified person attribute type
 	 * @param uuid the uuid
 	 * @return the person attribute type
-	 * @throws IllegalArgumentException if no such person attribute type exists
+	 * @throws MissingMetadataException if no such person attribute type exists
 	 */
 	public static PersonAttributeType getPersonAttributeType(String uuid) {
 		PersonAttributeType ret = Context.getPersonService().getPersonAttributeTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such person attribute type with identifier " + uuid);
+			throw new MissingMetadataException(PersonAttributeType.class, uuid);
 		}
 		return ret;
 	}
@@ -172,7 +173,7 @@ public class MetadataUtils {
 	 * Gets the specified privilege
 	 * @param identifier the name or uuid
 	 * @return the privilege
-	 * @throws IllegalArgumentException if no such privilege exists
+	 * @throws MissingMetadataException if no such privilege exists
 	 */
 	public static Privilege getPrivilege(String identifier) {
 		Privilege ret = null;
@@ -184,7 +185,7 @@ public class MetadataUtils {
 			ret = Context.getUserService().getPrivilege(identifier);
 		}
 		if (ret == null) {
-			throw new IllegalArgumentException("No such privilege with identifier " + identifier);
+			throw new MissingMetadataException(Privilege.class, identifier);
 		}
 		return ret;
 	}
@@ -193,12 +194,26 @@ public class MetadataUtils {
 	 * Gets the specified program
 	 * @param uuid the uuid
 	 * @return the program
-	 * @throws IllegalArgumentException if no such program exists
+	 * @throws MissingMetadataException if no such program exists
 	 */
 	public static Program getProgram(String uuid) {
 		Program ret = Context.getProgramWorkflowService().getProgramByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such program with identifier " + uuid);
+			throw new MissingMetadataException(Program.class, uuid);
+		}
+		return ret;
+	}
+
+	/**
+	 * Gets the specified provider attribute type
+	 * @param uuid the uuid
+	 * @return the visit attribute type
+	 * @throws MissingMetadataException if no such visit attribute type exists
+	 */
+	public static ProviderAttributeType getProviderAttributeType(String uuid) {
+		ProviderAttributeType ret = Context.getProviderService().getProviderAttributeTypeByUuid(uuid);
+		if (ret == null) {
+			throw new MissingMetadataException(ProviderAttributeType.class, uuid);
 		}
 		return ret;
 	}
@@ -207,12 +222,12 @@ public class MetadataUtils {
 	 * Gets the specified relationship type
 	 * @param uuid the uuid
 	 * @return the relationship type
-	 * @throws IllegalArgumentException if no such relationship type exists
+	 * @throws MissingMetadataException if no such relationship type exists
 	 */
 	public static RelationshipType getRelationshipType(String uuid) {
 		RelationshipType ret = Context.getPersonService().getRelationshipTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such relationship type with identifier " + uuid);
+			throw new MissingMetadataException(RelationshipType.class, uuid);
 		}
 		return ret;
 	}
@@ -221,7 +236,7 @@ public class MetadataUtils {
 	 * Gets the specified role
 	 * @param identifier the name or uuid
 	 * @return the role
-	 * @throws IllegalArgumentException if no such role exists
+	 * @throws MissingMetadataException if no such role exists
 	 */
 	public static Role getRole(String identifier) {
 		Role ret = null;
@@ -233,7 +248,7 @@ public class MetadataUtils {
 			ret = Context.getUserService().getRole(identifier);
 		}
 		if (ret == null) {
-			throw new IllegalArgumentException("No such role with identifier " + identifier);
+			throw new MissingMetadataException(Role.class, identifier);
 		}
 		return ret;
 	}
@@ -242,12 +257,12 @@ public class MetadataUtils {
 	 * Gets the specified visit attribute type
 	 * @param uuid the uuid
 	 * @return the visit attribute type
-	 * @throws IllegalArgumentException if no such visit attribute type exists
+	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
 	public static VisitAttributeType getVisitAttributeType(String uuid) {
 		VisitAttributeType ret = Context.getVisitService().getVisitAttributeTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such visit attribute type with identifier " + uuid);
+			throw new MissingMetadataException(VisitAttributeType.class, uuid);
 		}
 		return ret;
 	}
@@ -256,12 +271,12 @@ public class MetadataUtils {
 	 * Gets the specified visit type
 	 * @param uuid the uuid
 	 * @return the visit type
-	 * @throws IllegalArgumentException if no such visit type exists
+	 * @throws MissingMetadataException if no such visit type exists
 	 */
 	public static VisitType getVisitType(String uuid) {
 		VisitType ret = Context.getVisitService().getVisitTypeByUuid(uuid);
 		if (ret == null) {
-			throw new IllegalArgumentException("No such visit type with identifier " + uuid);
+			throw new MissingMetadataException(VisitType.class, uuid);
 		}
 		return ret;
 	}
