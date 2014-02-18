@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.FormResource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
@@ -91,6 +92,25 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
+	 * @see CoreConstructors#formResource(String, String, Class, String, Object)
+	 */
+	@Test
+	public void formResource() {
+		EncounterType encType = CoreConstructors.encounterType("name", "desc", "enctype-uuid");
+		Context.getEncounterService().saveEncounterType(encType);
+		Form form = CoreConstructors.form("name", "desc", "enctype-uuid", "1", "form-uuid");
+		Context.getFormService().saveForm(form);
+
+		FormResource obj = CoreConstructors.formResource("name", "form-uuid", FreeTextDatatype.class, null, "value");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getForm(), is(form));
+		Assert.assertThat(obj.getDatatypeClassname(), is(FreeTextDatatype.class.getName()));
+		Assert.assertThat(obj.getDatatypeConfig(), nullValue());
+		Assert.assertThat(obj.getUuid(), notNullValue());
+	}
+
+	/**
 	 * @see CoreConstructors#globalProperty(String, String, String)
 	 */
 	@Test
@@ -104,7 +124,7 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeConfig(), is(nullValue()));
 		Assert.assertThat(obj.getPropertyValue(), is(""));
 		Assert.assertThat(obj.getValue(), is((Object) "value"));
-		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+		Assert.assertThat(obj.getUuid(), notNullValue());
 
 		// Check with empty string value
 		obj = CoreConstructors.globalProperty("property", "desc", "");
@@ -115,7 +135,7 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeConfig(), is(nullValue()));
 		Assert.assertThat(obj.getPropertyValue(), is(""));
 		Assert.assertThat(obj.getValue(), is((Object) ""));
-		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+		Assert.assertThat(obj.getUuid(), notNullValue());
 
 		// Check with null value
 		obj = CoreConstructors.globalProperty("property", "desc", null);
@@ -126,7 +146,7 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeConfig(), is(nullValue()));
 		Assert.assertThat(obj.getPropertyValue(), is(""));
 		Assert.assertThat(obj.getValue(), is((Object) "")); // You'd think this would be null...
-		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+		Assert.assertThat(obj.getUuid(), notNullValue());
 	}
 
 	/**
@@ -143,7 +163,7 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeConfig(), is("config"));
 		Assert.assertThat(obj.getPropertyValue(), is(""));
 		Assert.assertThat(obj.getValue(), is((Object) new Integer(123)));
-		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+		Assert.assertThat(obj.getUuid(), notNullValue());
 
 		// Check with null value
 		obj = CoreConstructors.globalProperty("property", "desc", TestingDatatype.class, "config", null);
@@ -153,8 +173,8 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(obj.getDatatypeClassname(), is(TestingDatatype.class.getName()));
 		Assert.assertThat(obj.getDatatypeConfig(), is("config"));
 		Assert.assertThat(obj.getPropertyValue(), is(""));
-		Assert.assertThat(obj.getValue(), is(nullValue()));
-		Assert.assertThat(obj.getUuid(), is(notNullValue()));
+		Assert.assertThat(obj.getValue(), nullValue());
+		Assert.assertThat(obj.getUuid(), notNullValue());
 	}
 
 	/**

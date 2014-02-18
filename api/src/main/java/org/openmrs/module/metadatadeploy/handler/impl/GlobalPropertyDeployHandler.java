@@ -99,7 +99,7 @@ public class GlobalPropertyDeployHandler extends AbstractObjectDeployHandler<Glo
 
 	/**
 	 * Global properties don't really distinguish between blank and null values since the UI doesn't let a user
-	 * distinguish between the two. This method determibes if a global property has a value.
+	 * distinguish between the two. This method determines if a global property has a value.
 	 * @param obj the global property
 	 * @return true if it has value
 	 */

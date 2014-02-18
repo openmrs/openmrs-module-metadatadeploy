@@ -19,6 +19,7 @@ import org.apache.commons.collections.Transformer;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.FormResource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
@@ -59,7 +60,6 @@ public class CoreConstructors {
 		obj.setName(name);
 		obj.setDescription(description);
 		obj.setUuid(uuid);
-
 		return obj;
 	}
 
@@ -75,7 +75,6 @@ public class CoreConstructors {
 		obj.setName(name);
 		obj.setDescription(description);
 		obj.setUuid(uuid);
-
 		return obj;
 	}
 
@@ -98,6 +97,25 @@ public class CoreConstructors {
 	}
 
 	/**
+	 * Constructs a form resource without an explicitly defined UUID
+	 * @param name the name
+	 * @param formUuid the form UUID
+	 * @param datatype the custom data type (can be null)
+	 * @param datatypeConfig the data type config (can be null)
+	 * @param value the value
+	 * @return the form resource
+	 */
+	public static <T, H extends CustomDatatype<T>> FormResource formResource(String name, String formUuid, Class<H> datatype, String datatypeConfig, T value) {
+		FormResource obj = new FormResource();
+		obj.setName(name);
+		obj.setForm(MetadataUtils.getForm(formUuid));
+		obj.setDatatypeClassname(datatype.getName());
+		obj.setDatatypeConfig(datatypeConfig);
+		obj.setValue(value);
+		return obj;
+	}
+
+	/**
 	 * Constructs a global property
 	 * @param property the property
 	 * @param description the description
@@ -112,7 +130,7 @@ public class CoreConstructors {
 	 * Constructs a global property
 	 * @param property the property
 	 * @param description the description
-	 * @param datatype the custom data type (can be null)
+	 * @param datatype the custom data type
 	 * @param datatypeConfig the data type config (can be null)
 	 * @param value the value (can be null)
 	 * @return the global property
@@ -127,7 +145,6 @@ public class CoreConstructors {
 		obj.setDescription(description);
 		obj.setDatatypeClassname(datatype.getName());
 		obj.setDatatypeConfig(datatypeConfig);
-		obj.setUuid(UUID.randomUUID().toString());
 
 		// Global properties can't have null values
 		if (value != null) {
