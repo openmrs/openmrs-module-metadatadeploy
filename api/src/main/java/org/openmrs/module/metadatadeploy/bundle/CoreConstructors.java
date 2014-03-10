@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -49,11 +50,28 @@ import java.util.UUID;
 public class CoreConstructors {
 
 	/**
+	 * Constructs a concept source
+	 * @param name the name
+	 * @param description the description
+	 * @param hl7Code the HL7 code
+	 * @param uuid the UUID
+	 * @return the transient object
+	 */
+	public static ConceptSource conceptSource(String name, String description, String hl7Code, String uuid) {
+		ConceptSource obj = new ConceptSource();
+		obj.setName(name);
+		obj.setDescription(description);
+		obj.setHl7Code(hl7Code);
+		obj.setUuid(uuid);
+		return obj;
+	}
+
+	/**
 	 * Constructs an encounter role
 	 * @param name the name
 	 * @param description the description
 	 * @param uuid the UUID
-	 * @return the encounter role
+	 * @return the transient object
 	 */
 	public static EncounterRole encounterRole(String name, String description, String uuid) {
 		EncounterRole obj = new EncounterRole();
@@ -68,7 +86,7 @@ public class CoreConstructors {
 	 * @param name the name
 	 * @param description the description
 	 * @param uuid the UUID
-	 * @return the encounter type
+	 * @return the transient object
 	 */
 	public static EncounterType encounterType(String name, String description, String uuid) {
 		EncounterType obj = new EncounterType();
@@ -84,7 +102,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param encTypeUuid the encounter type UUID
 	 * @param uuid the UUID
-	 * @return the form
+	 * @return the transient object
 	 */
 	public static Form form(String name, String description, String encTypeUuid, String version, String uuid) {
 		Form obj = new Form();
@@ -103,7 +121,7 @@ public class CoreConstructors {
 	 * @param datatype the custom data type (can be null)
 	 * @param datatypeConfig the data type config (can be null)
 	 * @param value the value
-	 * @return the form resource
+	 * @return the transient object
 	 */
 	public static <T, H extends CustomDatatype<T>> FormResource formResource(String name, String formUuid, Class<H> datatype, String datatypeConfig, T value) {
 		FormResource obj = new FormResource();
@@ -120,7 +138,7 @@ public class CoreConstructors {
 	 * @param property the property
 	 * @param description the description
 	 * @param value the value (can be null)
-	 * @return the global property
+	 * @return the transient object
 	 */
 	public static GlobalProperty globalProperty(String property, String description, String value) {
 		return globalProperty(property, description, FreeTextDatatype.class, null, value);
@@ -133,7 +151,7 @@ public class CoreConstructors {
 	 * @param datatype the custom data type
 	 * @param datatypeConfig the data type config (can be null)
 	 * @param value the value (can be null)
-	 * @return the global property
+	 * @return the transient object
 	 */
 	public static <T, H extends CustomDatatype<T>> GlobalProperty globalProperty(String property,
 																		  String description,
@@ -159,7 +177,7 @@ public class CoreConstructors {
 	 * @param name the name
 	 * @param description the description
 	 * @param uuid the UUID
-	 * @return the location
+	 * @return the transient object
 	 */
 	public static Location location(String name, String description, String uuid) {
 		Location obj = new Location();
@@ -178,7 +196,7 @@ public class CoreConstructors {
 	 * @param minOccurs the minimum allowed occurrences
 	 * @param maxOccurs the maximum allowed occurrences
 	 * @param uuid the UUID
-	 * @return the location attribute type
+	 * @return the transient object
 	 */
 	public static LocationAttributeType locationAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
 		LocationAttributeType obj = new LocationAttributeType();
@@ -197,7 +215,7 @@ public class CoreConstructors {
 	 * @param name the name
 	 * @param description the description
 	 * @param uuid the UUID
-	 * @return the location tag
+	 * @return the transient object
 	 */
 	public static LocationTag locationTag(String name, String description, String uuid) {
 		LocationTag obj = new LocationTag();
@@ -224,7 +242,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param format the format regex
 	 * @param uuid the UUID
-	 * @return the patient identifier type
+	 * @return the transient object
 	 */
 	public static PatientIdentifierType patientIdentifierType(String name,
 													   String description,
@@ -256,7 +274,7 @@ public class CoreConstructors {
 	 * @param searchable whether attribute is searchable
 	 * @param sortWeight the sort weight
 	 * @param uuid the UUID
-	 * @return the person attribute type
+	 * @return the transient object
 	 */
 	public static PersonAttributeType personAttributeType(String name,
 												   String description,
@@ -281,7 +299,7 @@ public class CoreConstructors {
 	 * Constructs a privilege
 	 * @param privilege the privilege
 	 * @param description the description
-	 * @return the privilege
+	 * @return the transient object
 	 */
 	public static Privilege privilege(String privilege, String description) {
 		Privilege obj = new Privilege();
@@ -296,7 +314,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param concept the concept identifier
 	 * @param uuid the UUID
-	 * @return the program
+	 * @return the transient object
 	 */
 	public static Program program(String name, String description, String concept, String uuid) {
 		Program obj = new Program();
@@ -316,7 +334,7 @@ public class CoreConstructors {
 	 * @param minOccurs the minimum allowed occurrences
 	 * @param maxOccurs the maximum allowed occurrences
 	 * @param uuid the UUID
-	 * @return the provider attribute type
+	 * @return the transient object
 	 */
 	public static ProviderAttributeType providerAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
 		ProviderAttributeType obj = new ProviderAttributeType();
@@ -336,7 +354,7 @@ public class CoreConstructors {
 	 * @param description the description
 	 * @param inherited the inherited roles
 	 * @param privileges the privileges
-	 * @return the role
+	 * @return the transient object
 	 */
 	public static Role role(String role, String description, Set<String> inherited, Set<String> privileges) {
 		Role obj = new Role();
@@ -372,7 +390,7 @@ public class CoreConstructors {
 	 * @param minOccurs the minimum allowed occurrences
 	 * @param maxOccurs the maximum allowed occurrences
 	 * @param uuid the UUID
-	 * @return the visit attribute type
+	 * @return the transient object
 	 */
 	public static VisitAttributeType visitAttributeType(String name, String description, Class<?> datatype, String datatypeConfig, int minOccurs, int maxOccurs, String uuid) {
 		VisitAttributeType obj = new VisitAttributeType();
@@ -391,7 +409,7 @@ public class CoreConstructors {
 	 * @param name the name
 	 * @param description the description
 	 * @param uuid the UUID
-	 * @return the visit type
+	 * @return the transient object
 	 */
 	public static VisitType visitType(String name, String description, String uuid) {
 		VisitType obj = new VisitType();
@@ -399,6 +417,23 @@ public class CoreConstructors {
 		obj.setDescription(description);
 		obj.setUuid(uuid);
 		return obj;
+	}
+
+	/**
+	 * Construct a relationship type
+	 * @param aIsToB the A is to B
+	 * @param bIsToA the B is to A
+	 * @param description the description
+	 * @param uuid  the UUID
+	 * @return the transient object
+	 */
+	public static RelationshipType relationshipType(String aIsToB, String bIsToA, String description, String uuid) {
+		RelationshipType relationshipType = new RelationshipType();
+		relationshipType.setaIsToB(aIsToB);
+		relationshipType.setbIsToA(bIsToA);
+		relationshipType.setDescription(description);
+		relationshipType.setUuid(uuid);
+		return relationshipType;
 	}
 
 	/**
@@ -413,22 +448,4 @@ public class CoreConstructors {
 		}
 		return set;
 	}
-
-	/**
-	 * Construct a relationship type
-	 * @param aIsToB the A is to B
-	 * @param bIsToA the B is to A
-	 * @param description the description
-	 * @param uuid  the UUID
-	 * @return the relationship type
-	 */
-	public static RelationshipType relationshipType(String aIsToB, String bIsToA, String description, String uuid) {
-		RelationshipType relationshipType = new RelationshipType();
-		relationshipType.setaIsToB(aIsToB);
-		relationshipType.setbIsToA(bIsToA);
-		relationshipType.setDescription(description);
-		relationshipType.setUuid(uuid);
-		return relationshipType;
-	}
-
 }

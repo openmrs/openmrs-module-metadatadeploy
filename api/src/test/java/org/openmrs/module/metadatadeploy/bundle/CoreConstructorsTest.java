@@ -17,6 +17,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -48,6 +49,19 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void integration() {
 		new CoreConstructors();
+	}
+
+	/**
+	 * @see CoreConstructors#conceptSource(String, String, String, String)
+	 */
+	@Test
+	public void conceptSource() {
+		ConceptSource obj = CoreConstructors.conceptSource("name", "desc", "code", "obj-uuid");
+
+		Assert.assertThat(obj.getName(), is("name"));
+		Assert.assertThat(obj.getDescription(), is("desc"));
+		Assert.assertThat(obj.getHl7Code(), is("code"));
+		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
 	}
 
 	/**

@@ -14,52 +14,52 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
-import org.openmrs.EncounterRole;
+import org.openmrs.ConceptSource;
 import org.openmrs.annotation.Handler;
-import org.openmrs.api.EncounterService;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Deployment handler for encounter roles
+ * Deployment handler for concept sources
  */
-@Handler(supports = { EncounterRole.class })
-public class EncounterRoleDeployHandler extends AbstractObjectDeployHandler<EncounterRole> {
+@Handler(supports = { ConceptSource.class })
+public class ConceptSourceDeployHandler extends AbstractObjectDeployHandler<ConceptSource> {
 
 	@Autowired
-	@Qualifier("encounterService")
-	private EncounterService encounterService;
+	@Qualifier("conceptService")
+	private ConceptService conceptService;
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
 	 */
 	@Override
-	public EncounterRole fetch(String uuid) {
-		return encounterService.getEncounterRoleByUuid(uuid);
+	public ConceptSource fetch(String identifier) {
+		return conceptService.getConceptSourceByUuid(identifier);
 	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#findAlternateMatch(org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public EncounterRole findAlternateMatch(EncounterRole incoming) {
-		return null;
+	public ConceptSource findAlternateMatch(ConceptSource obj) {
+		return conceptService.getConceptSourceByName(obj.getName());
 	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#save(org.openmrs.OpenmrsObject)
 	 */
 	@Override
-	public EncounterRole save(EncounterRole obj) {
-		return encounterService.saveEncounterRole(obj);
+	public ConceptSource save(ConceptSource obj) {
+		return conceptService.saveConceptSource(obj);
 	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
 	 */
 	@Override
-	public void uninstall(EncounterRole obj, String reason) {
-		encounterService.retireEncounterRole(obj, reason);
+	public void uninstall(ConceptSource obj, String reason) {
+		conceptService.retireConceptSource(obj, reason);
 	}
 }
