@@ -16,7 +16,9 @@ package org.openmrs.module.metadatadeploy;
 
 import org.openmrs.Concept;
 import org.openmrs.ConceptNumeric;
+import org.openmrs.ConceptSource;
 import org.openmrs.Drug;
+import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
@@ -35,9 +37,36 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 
 /**
- * Utility methods for fail-fast fetching of metadata
+ * Utility methods for fail-fast fetching of metadata. Having specific methods for each class isn't scalable so those
+ * should probably be deprecated in favour of just existing(...) and possible(...). We should also stop implementing
+ * fetch logic which is different to that provided by the deploy handlers.
  */
 public class MetadataUtils {
+
+	/**
+	 * Fetches an object which is assumed to exist
+	 * @param clazz the object class
+	 * @param identifier the object identifier
+	 * @return the object
+	 * @throws org.openmrs.module.metadatadeploy.MissingMetadataException if object doesn't exist
+	 */
+	public static <T extends OpenmrsObject> T existing(Class<T> clazz, String identifier) {
+		T ret = Context.getService(MetadataDeployService.class).fetchObject(clazz, identifier);
+		if (ret == null) {
+			throw new MissingMetadataException(clazz, identifier);
+		}
+		return ret;
+	}
+
+	/**
+	 * Fetches an object which may or may not exist
+	 * @param clazz the object class
+	 * @param identifier the object identifier
+	 * @return the object or null
+	 */
+	public static <T extends OpenmrsObject> T possible(Class<T> clazz, String identifier) {
+		return Context.getService(MetadataDeployService.class).fetchObject(clazz, identifier);
+	}
 
 	/**
 	 * Gets the specified concept (by mapping or UUID)
@@ -94,7 +123,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such encounter type exists
 	 */
 	public static EncounterType getEncounterType(String uuid) {
-		return fetchExisting(EncounterType.class, uuid);
+		return existing(EncounterType.class, uuid);
 	}
 
 	/**
@@ -104,7 +133,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such form exists
 	 */
 	public static Form getForm(String uuid) {
-		return fetchExisting(Form.class, uuid);
+		return existing(Form.class, uuid);
 	}
 
 	/**
@@ -114,7 +143,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such location exists
 	 */
 	public static Location getLocation(String uuid) {
-		return fetchExisting(Location.class, uuid);
+		return existing(Location.class, uuid);
 	}
 
 	/**
@@ -124,7 +153,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such location attribute type exists
 	 */
 	public static LocationAttributeType getLocationAttributeType(String uuid) {
-		return fetchExisting(LocationAttributeType.class, uuid);
+		return existing(LocationAttributeType.class, uuid);
 	}
 
 	/**
@@ -134,7 +163,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such patient identifier type exists
 	 */
 	public static PatientIdentifierType getPatientIdentifierType(String uuid) {
-		return fetchExisting(PatientIdentifierType.class, uuid);
+		return existing(PatientIdentifierType.class, uuid);
 	}
 
 	/**
@@ -144,7 +173,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such person attribute type exists
 	 */
 	public static PersonAttributeType getPersonAttributeType(String uuid) {
-		return fetchExisting(PersonAttributeType.class, uuid);
+		return existing(PersonAttributeType.class, uuid);
 	}
 
 	/**
@@ -175,7 +204,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such program exists
 	 */
 	public static Program getProgram(String uuid) {
-		return fetchExisting(Program.class, uuid);
+		return existing(Program.class, uuid);
 	}
 
 	/**
@@ -185,7 +214,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
 	public static ProviderAttributeType getProviderAttributeType(String uuid) {
-		return fetchExisting(ProviderAttributeType.class, uuid);
+		return existing(ProviderAttributeType.class, uuid);
 	}
 
 	/**
@@ -195,7 +224,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such relationship type exists
 	 */
 	public static RelationshipType getRelationshipType(String uuid) {
-		return fetchExisting(RelationshipType.class, uuid);
+		return existing(RelationshipType.class, uuid);
 	}
 
 	/**
@@ -226,7 +255,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
 	public static VisitAttributeType getVisitAttributeType(String uuid) {
-		return fetchExisting(VisitAttributeType.class, uuid);
+		return existing(VisitAttributeType.class, uuid);
 	}
 
 	/**
@@ -236,22 +265,7 @@ public class MetadataUtils {
 	 * @throws MissingMetadataException if no such visit type exists
 	 */
 	public static VisitType getVisitType(String uuid) {
-		return fetchExisting(VisitType.class, uuid);
-	}
-
-	/**
-	 * Fetches an object which is assumed to exist
-	 * @param clazz the object class
-	 * @param identifier the object identifier
-	 * @return the object
-	 * @throws org.openmrs.module.metadatadeploy.MissingMetadataException if object doesn't exist
-	 */
-	protected static <T extends OpenmrsObject> T fetchExisting(Class<T> clazz, String identifier) {
-		T ret = Context.getService(MetadataDeployService.class).fetchObject(clazz, identifier);
-		if (ret == null) {
-			throw new MissingMetadataException(VisitType.class, identifier);
-		}
-		return ret;
+		return existing(VisitType.class, uuid);
 	}
 
 	/**

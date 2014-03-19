@@ -31,11 +31,11 @@ import org.openmrs.ProviderAttributeType;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitAttributeType;
+import org.openmrs.VisitType;
 import org.openmrs.api.context.Context;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests for {@link MetadataUtils}
@@ -47,6 +47,40 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void integration() {
 		new MetadataUtils();
+	}
+
+	/**
+	 * @see MetadataUtils#existing(Class, String)
+	 */
+	@Test
+	public void existing_shouldFetchExisting() {
+		VisitType initial = Context.getVisitService().getVisitTypeByUuid("c0c579b0-8e59-401d-8a4a-976a0b183519");
+		Assert.assertThat(MetadataUtils.existing(VisitType.class, "c0c579b0-8e59-401d-8a4a-976a0b183519"), is(initial));
+	}
+
+	/**
+	 * @see MetadataUtils#existing(Class, String)
+	 */
+	@Test(expected = MissingMetadataException.class)
+	public void existing_shouldThrowExceptionForNonExistent() {
+		MetadataUtils.existing(VisitType.class, NONEXISTENT_UUID);
+	}
+
+	/**
+	 * @see MetadataUtils#possible(Class, String)
+	 */
+	@Test
+	public void possible_shouldFetchExisting() {
+		VisitType initial = Context.getVisitService().getVisitTypeByUuid("c0c579b0-8e59-401d-8a4a-976a0b183519");
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, "c0c579b0-8e59-401d-8a4a-976a0b183519"), is(initial));
+	}
+
+	/**
+	 * @see MetadataUtils#existing(Class, String)
+	 */
+	@Test
+	public void possible_shouldReturnNullForNonExistent() {
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, NONEXISTENT_UUID), nullValue());
 	}
 
 	/**
