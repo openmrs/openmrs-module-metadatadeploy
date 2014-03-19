@@ -16,9 +16,7 @@ package org.openmrs.module.metadatadeploy;
 
 import org.openmrs.Concept;
 import org.openmrs.ConceptNumeric;
-import org.openmrs.ConceptSource;
 import org.openmrs.Drug;
-import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
@@ -37,9 +35,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 
 /**
- * Utility methods for fail-fast fetching of metadata. Having specific methods for each class isn't scalable so those
- * should probably be deprecated in favour of just existing(...) and possible(...). We should also stop implementing
- * fetch logic which is different to that provided by the deploy handlers.
+ * Utility methods for fetching of metadata outside of a bundle.
+ *
+ * Note: Having specific methods for each class isn't scalable so those should probably be deprecated in favour of just
+ * existing(...) and possible(...). We should also stop implementing fetch logic which is different to that provided by
+ * the deploy handlers.
  */
 public class MetadataUtils {
 
