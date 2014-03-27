@@ -22,6 +22,7 @@ import org.openmrs.Patient;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
 import org.openmrs.Role;
+import org.openmrs.VisitType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
@@ -69,10 +70,10 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	public void installBundles() {
 		deployService.installBundles(Arrays.<MetadataBundle>asList(testBundle3, testBundle2, testBundle1));
 
-		Privilege privilege1 = MetadataUtils.getPrivilege("Test Privilege 1");
-		Privilege privilege2 = MetadataUtils.getPrivilege("Test Privilege 2");
-		Role role1 = MetadataUtils.getRole("Test Role 1");
-		Role role2 = MetadataUtils.getRole("Test Role 2");
+		Privilege privilege1 = MetadataUtils.existing(Privilege.class, "Test Privilege 1");
+		Privilege privilege2 = MetadataUtils.existing(Privilege.class, "Test Privilege 2");
+		Role role1 = MetadataUtils.existing(Role.class, "Test Role 1");
+		Role role2 = MetadataUtils.existing(Role.class, "Test Role 2");
 
 		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
 
@@ -108,23 +109,18 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
 		final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
 
-		try {
-			// Check data isn't there
-			MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c");
-			Assert.fail();
-		}
-		catch (MissingMetadataException ex) {
-		}
+		// Check data isn't there
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), nullValue());
 
 		ClassLoader classLoader = getClass().getClassLoader();
 
 		// Simulate first time startup
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(true));
-		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 
 		// Simulate starting a second time
 		Assert.assertThat(deployService.installPackage(TEST_PACKAGE_FILENAME, classLoader, TEST_PACKAGE_GROUP_UUID), is(false));
-		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 	}
 
 	/**
@@ -201,7 +197,7 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	@Test
 	public void overwriteObject_shouldOverwriteObject() throws Exception {
 		Location incoming = location("New name", "New desc", "68265F64-BD50-4E4F-BA1F-23F24E301FBC");
-		Location existing = MetadataUtils.getLocation("9356400c-a5a2-4532-8f2b-2361b3446eb8"); // Xanadu
+		Location existing = MetadataUtils.existing(Location.class, "9356400c-a5a2-4532-8f2b-2361b3446eb8"); // Xanadu
 
 		deployService.overwriteObject(incoming, existing);
 

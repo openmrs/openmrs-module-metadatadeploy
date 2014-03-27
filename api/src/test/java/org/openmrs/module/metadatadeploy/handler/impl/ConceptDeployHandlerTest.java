@@ -12,28 +12,32 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.metadatadeploy;
+package org.openmrs.module.metadatadeploy.handler.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.VisitType;
+import org.openmrs.Concept;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 /**
- * Tests for {@link MissingMetadataException}
+ * Tests for {@link ConceptDeployHandler}
  */
-public class MissingMetadataExceptionTest extends BaseModuleContextSensitiveTest {
+public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
+	@Autowired
+	private MetadataDeployService deployService;
+
+	/**
+	 * Tests use of handler for fetching
+	 */
 	@Test
 	public void integration() {
-		try {
-			MetadataUtils.existing(VisitType.class, "invalid-uuid");
-		}
-		catch (MissingMetadataException ex) {
-			Assert.assertThat(ex.getObjectClass().equals(VisitType.class), is(true));
-			Assert.assertThat(ex.getObjectIdentifier(), is("invalid-uuid"));
-		}
+		Concept cd4 = Context.getConceptService().getConcept(5497);
+		Assert.assertThat(deployService.fetchObject(Concept.class, "a09ab2c5-878e-4905-b25d-5784167d0216"), is(cd4));
 	}
 }

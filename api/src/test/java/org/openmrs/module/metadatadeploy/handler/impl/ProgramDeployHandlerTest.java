@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Concept;
 import org.openmrs.Program;
 import org.openmrs.ProgramWorkflow;
 import org.openmrs.ProgramWorkflowState;
@@ -75,12 +76,12 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		// Add some workflows and states to check our custom retire works
 		ProgramWorkflowState state = new ProgramWorkflowState();
 		state.setName("State");
-		state.setConcept(MetadataUtils.getConcept("e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
+		state.setConcept(MetadataUtils.existing(Concept.class, "e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
 		state.setInitial(true);
 		state.setTerminal(false);
 		ProgramWorkflow workflow = new ProgramWorkflow();
 		workflow.setName("Workflow");
-		workflow.setConcept(MetadataUtils.getConcept("e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
+		workflow.setConcept(MetadataUtils.existing(Concept.class, "e10ffe54-5184-4efe-8960-cd565ec1cdf8"));
 		workflow.addState(state);
 		updated.addWorkflow(workflow);
 

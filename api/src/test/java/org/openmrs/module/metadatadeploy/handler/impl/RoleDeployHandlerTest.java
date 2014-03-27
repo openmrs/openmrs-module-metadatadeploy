@@ -137,8 +137,8 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 		//TestUtil.printOutTableContents(getConnection(), "role_role");
 
-		Role role1 = MetadataUtils.getRole("Role1");
-		Role role2 = MetadataUtils.getRole("Role2");
+		Role role1 = MetadataUtils.existing(Role.class, "Role1");
+		Role role2 = MetadataUtils.existing(Role.class, "Role2");
 
 		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
 	}

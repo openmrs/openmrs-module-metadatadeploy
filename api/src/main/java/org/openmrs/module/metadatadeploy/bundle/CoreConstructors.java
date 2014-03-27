@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.openmrs.Concept;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -42,7 +43,6 @@ import org.openmrs.patient.IdentifierValidator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Constructors for different core metadata classes
@@ -108,7 +108,7 @@ public class CoreConstructors {
 		Form obj = new Form();
 		obj.setName(name);
 		obj.setDescription(description);
-		obj.setEncounterType(MetadataUtils.getEncounterType(encTypeUuid));
+		obj.setEncounterType(MetadataUtils.existing(EncounterType.class, encTypeUuid));
 		obj.setVersion(version);
 		obj.setUuid(uuid);
 		return obj;
@@ -126,7 +126,7 @@ public class CoreConstructors {
 	public static <T, H extends CustomDatatype<T>> FormResource formResource(String name, String formUuid, Class<H> datatype, String datatypeConfig, T value) {
 		FormResource obj = new FormResource();
 		obj.setName(name);
-		obj.setForm(MetadataUtils.getForm(formUuid));
+		obj.setForm(MetadataUtils.existing(Form.class, formUuid));
 		obj.setDatatypeClassname(datatype.getName());
 		obj.setDatatypeConfig(datatypeConfig);
 		obj.setValue(value);
@@ -312,15 +312,15 @@ public class CoreConstructors {
 	 * Constructs a program
 	 * @param name the name
 	 * @param description the description
-	 * @param concept the concept identifier
+	 * @param conceptUuid the concept UUID
 	 * @param uuid the UUID
 	 * @return the transient object
 	 */
-	public static Program program(String name, String description, String concept, String uuid) {
+	public static Program program(String name, String description, String conceptUuid, String uuid) {
 		Program obj = new Program();
 		obj.setName(name);
 		obj.setDescription(description);
-		obj.setConcept(MetadataUtils.getConcept(concept));
+		obj.setConcept(MetadataUtils.existing(Concept.class, conceptUuid));
 		obj.setUuid(uuid);
 		return obj;
 	}
@@ -365,7 +365,7 @@ public class CoreConstructors {
 			obj.setInheritedRoles((Set) CollectionUtils.collect(inherited, new Transformer() {
 				@Override
 				public Object transform(Object o) {
-					return MetadataUtils.getRole((String) o);
+					return MetadataUtils.existing(Role.class, (String) o);
 				}
 			}, new HashSet()));
 		}
@@ -373,7 +373,7 @@ public class CoreConstructors {
 			obj.setPrivileges((Set) CollectionUtils.collect(privileges, new Transformer() {
 				@Override
 				public Object transform(Object o) {
-					return MetadataUtils.getPrivilege((String) o);
+					return MetadataUtils.existing(Privilege.class, (String) o);
 				}
 			}, new HashSet()));
 		}

@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.VisitType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
@@ -56,7 +57,7 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		emptyBundle.install(pkg1);
 
 		// Check contained visit type was installed
-		Assert.assertThat(MetadataUtils.getVisitType("3371a4d4-f66f-4454-a86d-92c7b3da990c"), is(notNullValue()));
+		Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 	}
 
 	/**
