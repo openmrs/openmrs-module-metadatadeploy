@@ -37,7 +37,7 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 /**
  * Utility methods for fetching of metadata outside of a bundle.
  *
- * Note: Having specific methods for each class isn't scalable so those should probably be deprecated in favour of just
+ * Note: Having specific methods for each class isn't scalable so these have been deprecated in favour of just
  * existing(...) and possible(...). We should also stop implementing fetch logic which is different to that provided by
  * the deploy handlers.
  */
@@ -74,6 +74,7 @@ public class MetadataUtils {
 	 * @return the concept
 	 * @throws MissingMetadataException if no such concept exists
 	 */
+	@Deprecated
 	public static Concept getConcept(String identifier) {
 		Concept concept;
 
@@ -108,6 +109,7 @@ public class MetadataUtils {
 	 * @return the drug
 	 * @throws MissingMetadataException if no such drug exists
 	 */
+	@Deprecated
 	public static Drug getDrug(String uuid) {
 		Drug ret = Context.getConceptService().getDrugByUuid(uuid);
 		if (ret == null) {
@@ -122,6 +124,7 @@ public class MetadataUtils {
 	 * @return the encounter type
 	 * @throws MissingMetadataException if no such encounter type exists
 	 */
+	@Deprecated
 	public static EncounterType getEncounterType(String uuid) {
 		return existing(EncounterType.class, uuid);
 	}
@@ -132,6 +135,7 @@ public class MetadataUtils {
 	 * @return the form
 	 * @throws MissingMetadataException if no such form exists
 	 */
+	@Deprecated
 	public static Form getForm(String uuid) {
 		return existing(Form.class, uuid);
 	}
@@ -142,6 +146,7 @@ public class MetadataUtils {
 	 * @return the location
 	 * @throws MissingMetadataException if no such location exists
 	 */
+	@Deprecated
 	public static Location getLocation(String uuid) {
 		return existing(Location.class, uuid);
 	}
@@ -152,6 +157,7 @@ public class MetadataUtils {
 	 * @return the location attribute type
 	 * @throws MissingMetadataException if no such location attribute type exists
 	 */
+	@Deprecated
 	public static LocationAttributeType getLocationAttributeType(String uuid) {
 		return existing(LocationAttributeType.class, uuid);
 	}
@@ -162,6 +168,7 @@ public class MetadataUtils {
 	 * @return the patient identifier type
 	 * @throws MissingMetadataException if no such patient identifier type exists
 	 */
+	@Deprecated
 	public static PatientIdentifierType getPatientIdentifierType(String uuid) {
 		return existing(PatientIdentifierType.class, uuid);
 	}
@@ -172,6 +179,7 @@ public class MetadataUtils {
 	 * @return the person attribute type
 	 * @throws MissingMetadataException if no such person attribute type exists
 	 */
+	@Deprecated
 	public static PersonAttributeType getPersonAttributeType(String uuid) {
 		return existing(PersonAttributeType.class, uuid);
 	}
@@ -182,6 +190,7 @@ public class MetadataUtils {
 	 * @return the privilege
 	 * @throws MissingMetadataException if no such privilege exists
 	 */
+	@Deprecated
 	public static Privilege getPrivilege(String identifier) {
 		Privilege ret = null;
 
@@ -203,6 +212,7 @@ public class MetadataUtils {
 	 * @return the program
 	 * @throws MissingMetadataException if no such program exists
 	 */
+	@Deprecated
 	public static Program getProgram(String uuid) {
 		return existing(Program.class, uuid);
 	}
@@ -213,6 +223,7 @@ public class MetadataUtils {
 	 * @return the visit attribute type
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
+	@Deprecated
 	public static ProviderAttributeType getProviderAttributeType(String uuid) {
 		return existing(ProviderAttributeType.class, uuid);
 	}
@@ -223,6 +234,7 @@ public class MetadataUtils {
 	 * @return the relationship type
 	 * @throws MissingMetadataException if no such relationship type exists
 	 */
+	@Deprecated
 	public static RelationshipType getRelationshipType(String uuid) {
 		return existing(RelationshipType.class, uuid);
 	}
@@ -233,6 +245,7 @@ public class MetadataUtils {
 	 * @return the role
 	 * @throws MissingMetadataException if no such role exists
 	 */
+	@Deprecated
 	public static Role getRole(String identifier) {
 		Role ret = null;
 
@@ -254,6 +267,7 @@ public class MetadataUtils {
 	 * @return the visit attribute type
 	 * @throws MissingMetadataException if no such visit attribute type exists
 	 */
+	@Deprecated
 	public static VisitAttributeType getVisitAttributeType(String uuid) {
 		return existing(VisitAttributeType.class, uuid);
 	}
@@ -264,6 +278,7 @@ public class MetadataUtils {
 	 * @return the visit type
 	 * @throws MissingMetadataException if no such visit type exists
 	 */
+	@Deprecated
 	public static VisitType getVisitType(String uuid) {
 		return existing(VisitType.class, uuid);
 	}
