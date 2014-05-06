@@ -68,7 +68,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 				Object syncKey = sync.getObjectSyncKey(next);
 
 				if (syncKey == null) {
-					log.error("Unable to synchronize object '" + next.getName() + "' with no sync key");
+					throw new RuntimeException("Incoming object '" + next.getName() + "' has no sync key");
 				} else {
 					synchronizeObject(deployService, syncKey, next);
 				}
