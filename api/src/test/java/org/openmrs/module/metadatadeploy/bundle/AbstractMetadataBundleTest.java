@@ -224,11 +224,6 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		}
 
 		@Override
-		public EncounterType fetchExistingById(int id) {
-			return Context.getEncounterService().getEncounterType(id);
-		}
-
-		@Override
 		public Object getObjectSyncKey(EncounterType obj) {
 			return obj.getName();
 		}

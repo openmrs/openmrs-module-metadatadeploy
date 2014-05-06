@@ -30,13 +30,6 @@ public interface ObjectSynchronization<T extends OpenmrsObject> {
 	List<T> fetchAllExisting();
 
 	/**
-	 * Fetches an existing object by its id
-	 * @param id the object id
-	 * @return the existing object
-	 */
-	T fetchExistingById(int id);
-
-	/**
 	 * Gets the synchronization key of the given object
 	 * @param obj the object
 	 * @return the synchronization key

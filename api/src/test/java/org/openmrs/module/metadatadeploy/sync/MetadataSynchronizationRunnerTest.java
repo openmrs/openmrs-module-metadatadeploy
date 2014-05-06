@@ -91,11 +91,6 @@ public class MetadataSynchronizationRunnerTest extends BaseModuleContextSensitiv
 		}
 
 		@Override
-		public Location fetchExistingById(int id) {
-			return locationService.getLocation(id);
-		}
-
-		@Override
 		public Object getObjectSyncKey(Location obj) {
 			return obj.getUuid();
 		}

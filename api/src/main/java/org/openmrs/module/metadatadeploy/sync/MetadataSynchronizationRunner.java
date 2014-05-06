@@ -37,9 +37,9 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 
 	protected ObjectSynchronization<T> sync;
 
-	protected Map<Object, Integer> keyCache = new HashMap<Object, Integer>();
+	protected Map<Object, T> keyCache = new HashMap<Object, T>();
 
-	protected Set<Integer> notSyncedObjects = new HashSet<Integer>();
+	protected Set<T> notSyncedObjects = new HashSet<T>();
 
 	protected SyncResult<T> result = new SyncResult<T>();
 
@@ -98,8 +98,8 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 					log.warn("Ignoring object '" + obj.getName() + "' with duplicate sync key " + syncKey);
 				}
 				else {
-					keyCache.put(syncKey, obj.getId());
-					notSyncedObjects.add(obj.getId());
+					keyCache.put(syncKey, obj);
+					notSyncedObjects.add(obj);
 				}
 			}
 		}
@@ -114,13 +114,12 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 	 */
 	protected void synchronizeObject(MetadataDeployService deployService, Object syncKey, T incoming) {
 		// Look in the cache for an existing object with this sync key
-		Integer existingId = keyCache.get(syncKey);
-		T existing = existingId != null ? sync.fetchExistingById(existingId) : null;
+		T existing = keyCache.get(syncKey);
 
 		if (existing == null) {
 			// Save incoming as new
 			deployService.saveObject(incoming);
-			keyCache.put(syncKey, incoming.getId());
+			keyCache.put(syncKey, incoming);
 
 			log.info("Created new object '" + incoming.getName() + "' with sync key " + syncKey);
 			result.getCreated().add(incoming);
@@ -134,7 +133,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 				result.getUpdated().add(existing);
 			}
 
-			notSyncedObjects.remove(existing.getId());
+			notSyncedObjects.remove(existing);
 		}
 	}
 
@@ -143,8 +142,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 	 */
 	protected void retireExistingNotInSource(MetadataDeployService deployService) {
 		// Retire objects that weren't in the sync source
-		for (Integer notSyncedId : notSyncedObjects) {
-			T notSynced = sync.fetchExistingById(notSyncedId);
+		for (T notSynced : notSyncedObjects) {
 			if (!notSynced.isRetired()) {
 				deployService.uninstallObject(notSynced, "Not found in sync source");
 
