@@ -37,11 +37,14 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 
 	protected ObjectSynchronization<T> sync;
 
+	protected SyncResult<T> result = new SyncResult<T>();
+
+	// Cache of sync keys to objects to avoid re-fetching objects from database
 	protected Map<Object, T> keyCache = new HashMap<Object, T>();
 
-	protected Set<T> notSyncedObjects = new HashSet<T>();
-
-	protected SyncResult<T> result = new SyncResult<T>();
+	// After sync this will contain all existing items that weren't in the source. This is a map by id rather than just
+	// a set because object equality is based on UUIDs and those can change during a sync
+	protected Map<Integer, T> notSyncedObjects = new HashMap<Integer, T>();
 
 	/**
 	 * Creates a new synchronization process
@@ -99,7 +102,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 				}
 				else {
 					keyCache.put(syncKey, obj);
-					notSyncedObjects.add(obj);
+					notSyncedObjects.put(obj.getId(), obj);
 				}
 			}
 		}
@@ -133,7 +136,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 				result.getUpdated().add(existing);
 			}
 
-			notSyncedObjects.remove(existing);
+			notSyncedObjects.remove(existing.getId());
 		}
 	}
 
@@ -142,7 +145,7 @@ public class MetadataSynchronizationRunner<T extends OpenmrsMetadata> {
 	 */
 	protected void retireExistingNotInSource(MetadataDeployService deployService) {
 		// Retire objects that weren't in the sync source
-		for (T notSynced : notSyncedObjects) {
+		for (T notSynced : notSyncedObjects.values()) {
 			if (!notSynced.isRetired()) {
 				deployService.uninstallObject(notSynced, "Not found in sync source");
 
