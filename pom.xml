@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>metadatadeploy</artifactId>
-	<version>1.3</version>
+	<version>1.4-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>Metadata Deploy</name>
@@ -24,7 +24,7 @@
 		<connection>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</connection>
 		<developerConnection>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</developerConnection>
 		<url>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</url>
-		<tag>1.3</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<modules>
