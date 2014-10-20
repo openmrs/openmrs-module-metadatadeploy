@@ -24,6 +24,7 @@ import org.openmrs.Form;
 import org.openmrs.FormResource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
+import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
@@ -209,6 +210,19 @@ public class CoreConstructors {
 		obj.setUuid(uuid);
 		return obj;
 	}
+
+    /**
+     * Constructs a location attribute
+     */
+     public static LocationAttribute locationAttribute(String locationUuid, String locationAttributeType, Object value, String uuid) {
+         LocationAttribute obj = new LocationAttribute();
+         obj.setLocation(MetadataUtils.existing(Location.class, locationUuid));
+         obj.setAttributeType(MetadataUtils.existing(LocationAttributeType.class, locationAttributeType));
+         obj.setValue(value);
+         obj.setUuid(uuid);
+         return obj;
+     }
+
 
 	/**
 	 * Constructs a location tag
