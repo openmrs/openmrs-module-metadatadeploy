@@ -40,6 +40,7 @@ import org.openmrs.customdatatype.datatype.FreeTextDatatype;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.patient.IdentifierValidator;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -186,6 +187,31 @@ public class CoreConstructors {
 		obj.setUuid(uuid);
 		return obj;
 	}
+
+    /**
+     * Constructs a location (with more fields)
+     * @param name
+     * @param description
+     * @param uuid
+     * @param parentLocationUuid
+     * @param tagUuids
+     * @return the transient object
+     */
+    public static Location location(String name, String description, String uuid, String parentLocationUuid, Collection<String> tagUuids) {
+        Location obj = new Location();
+        obj.setName(name);
+        obj.setDescription(description);
+        obj.setUuid(uuid);
+        if (parentLocationUuid != null) {
+            obj.setParentLocation(MetadataUtils.existing(Location.class, parentLocationUuid));
+        }
+        if (tagUuids != null) {
+            for (String tagUuid : tagUuids) {
+                obj.addTag(MetadataUtils.existing(LocationTag.class, tagUuid));
+            }
+        }
+        return obj;
+    }
 
 	/**
 	 * Constructs a location attribute type
