@@ -22,9 +22,12 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.location;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.locationTag;
 
 /**
  * Tests for {@link LocationDeployHandler}
@@ -36,6 +39,7 @@ public class LocationDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 	@Test
 	public void integration() {
+
 		// Check installing new
 		deployService.installObject(location("New name", "New desc", "obj-uuid"));
 
@@ -70,4 +74,41 @@ public class LocationDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		// Check everything can be persisted
 		Context.flushSession();
 	}
+
+    @Test
+    public void integrationWithParentAndTags() {
+
+        // create some sample tags
+        deployService.installObject(locationTag("Tag1", "Tag1", "tag1-uuid"));
+        deployService.installObject(locationTag("Tag2", "Tag2", "tag2-uuid"));
+
+        // create some sample parents
+        Location parent1 = deployService.installObject(location("Parent1", "Parent1", "parent1-uuid"));
+        Location parent2 = deployService.installObject(location("Parent2", "Parent2", "parent2-uuid"));
+
+        // Check installing new
+        deployService.installObject(location("New name", "New desc", "obj-uuid", "parent1-uuid", Arrays.asList("tag1-uuid")));
+
+        Location created = Context.getLocationService().getLocationByUuid("obj-uuid");
+        Assert.assertThat(created.getName(), is("New name"));
+        Assert.assertThat(created.getDescription(), is("New desc"));
+        Assert.assertThat(created.getParentLocation(), is(parent1));
+        Assert.assertTrue(created.hasTag("Tag1"));
+        Assert.assertFalse(created.hasTag("Tag2"));
+
+        // Check updating existing
+        deployService.installObject(location("Updated name", "Updated desc", "obj-uuid", "parent2-uuid", Arrays.asList("tag2-uuid")));
+
+        Location updated = Context.getLocationService().getLocationByUuid("obj-uuid");
+        Assert.assertThat(updated.getId(), is(created.getId()));
+        Assert.assertThat(updated.getName(), is("Updated name"));
+        Assert.assertThat(updated.getDescription(), is("Updated desc"));
+        Assert.assertThat(created.getParentLocation(), is(parent2));
+        Assert.assertFalse(created.hasTag("Tag1"));
+        Assert.assertTrue(created.hasTag("Tag2"));
+
+        // Check everything can be persisted
+        Context.flushSession();
+
+    }
 }
