@@ -17,9 +17,12 @@ package org.openmrs.module.metadatadeploy.handler.impl;
 import org.openmrs.Location;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.LocationService;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.Collections;
 
 /**
  * Deployment handler for locations
@@ -46,6 +49,14 @@ public class LocationDeployHandler extends AbstractObjectDeployHandler<Location>
 	public Location save(Location obj) {
 		return locationService.saveLocation(obj);
 	}
+    
+    @Override
+    public void overwrite(Location incoming, Location existing) {
+        Integer existingId = existing.getId();
+        // since location attributes are defined separately from locations, we want to preserve them when overwrites
+        ObjectUtils.overwrite(incoming, existing, Collections.singleton("attributes"));
+        existing.setId(existingId);
+    }
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
