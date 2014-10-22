@@ -12,9 +12,10 @@ import java.util.Set;
 
 /**
  * Master bean that stores all the object deploy handlers
- * We don't wire these directly into the MetadataDeployServiceImpl because of the slowdown that occurs when autowiring beans into a proxied bean (ie, a service)
+ * We don't wire these directly into the MetadataDeployServiceImpl because of the slowdown that occurs
+ * when autowiring beans into a proxied bean (ie, a service)
  */
-@Component
+@Component(value = "objectDeployHandlers")
 public class ObjectDeployHandlers {
 
     private Map<Class<? extends OpenmrsObject>, ObjectDeployHandler> handlers;
