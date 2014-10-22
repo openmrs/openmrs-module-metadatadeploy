@@ -17,7 +17,6 @@ package org.openmrs.module.metadatadeploy.api.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.annotation.Handler;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -25,6 +24,7 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
 import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler;
+import org.openmrs.module.metadatadeploy.handler.ObjectDeployHandlers;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatasharing.ImportConfig;
 import org.openmrs.module.metadatasharing.ImportMode;
@@ -32,7 +32,6 @@ import org.openmrs.module.metadatasharing.ImportedPackage;
 import org.openmrs.module.metadatasharing.MetadataSharing;
 import org.openmrs.module.metadatasharing.api.MetadataSharingService;
 import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,34 +50,8 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 
 	protected static final Log log = LogFactory.getLog(MetadataDeployServiceImpl.class);
 
-	private Map<Class<? extends OpenmrsObject>, ObjectDeployHandler> handlers;
-
-	/**
-	 * Sets the object handlers, reorganising them into a map
-	 * @param handlers the handler components
-	 */
-	@Autowired
-	public void setHandlers(Set<ObjectDeployHandler> handlers) {
-		this.handlers = new HashMap<Class<? extends OpenmrsObject>, ObjectDeployHandler>();
-
-		for (ObjectDeployHandler handler : handlers) {
-			Handler handlerAnnotation = handler.getClass().getAnnotation(Handler.class);
-			if (handlerAnnotation != null) {
-				for (Class<?> supportedClass : handlerAnnotation.supports()) {
-					if (OpenmrsObject.class.isAssignableFrom(supportedClass)) {
-                        if (!this.handlers.containsKey(supportedClass)
-                                || handlerAnnotation.order() < this.handlers.get(supportedClass).getClass().getAnnotation(Handler.class).order()) {
-                            this.handlers.put((Class<? extends OpenmrsObject>) supportedClass, handler);
-                        }
-					}
-					else {
-						throw new APIException("Handler annotation specifies a non OpenmrsObject subclass");
-					}
-				}
-			}
-		}
-	}
-
+    
+    
 	/**
 	 * @see MetadataDeployService#installBundles(java.util.Collection)
 	 */
@@ -276,7 +249,8 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 * @throws RuntimeException if no suitable handler exists
 	 */
 	protected <T extends OpenmrsObject> ObjectDeployHandler<T> getHandler(Class<T> clazz) throws RuntimeException {
-		ObjectDeployHandler<T> handler = handlers.get(clazz);
+        // assumes there is only one ObjectDeployHandlers component
+		ObjectDeployHandler<T> handler = Context.getRegisteredComponents(ObjectDeployHandlers.class).get(0).getHandlers().get(clazz);
 		if (handler != null) {
 			return handler;
 		}
