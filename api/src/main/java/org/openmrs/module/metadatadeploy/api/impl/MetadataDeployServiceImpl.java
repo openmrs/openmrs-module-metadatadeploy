@@ -66,7 +66,10 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 			if (handlerAnnotation != null) {
 				for (Class<?> supportedClass : handlerAnnotation.supports()) {
 					if (OpenmrsObject.class.isAssignableFrom(supportedClass)) {
-						this.handlers.put((Class<? extends OpenmrsObject>) supportedClass, handler);
+                        if (!this.handlers.containsKey(supportedClass)
+                                || handlerAnnotation.order() < this.handlers.get(supportedClass).getClass().getAnnotation(Handler.class).order()) {
+                            this.handlers.put((Class<? extends OpenmrsObject>) supportedClass, handler);
+                        }
 					}
 					else {
 						throw new APIException("Handler annotation specifies a non OpenmrsObject subclass");
