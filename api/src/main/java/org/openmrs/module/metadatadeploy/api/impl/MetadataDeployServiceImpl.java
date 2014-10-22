@@ -50,7 +50,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 
 	protected static final Log log = LogFactory.getLog(MetadataDeployServiceImpl.class);
 
-    private ObjectDeployHandlers objectDeployHandlers;
+    
     
 	/**
 	 * @see MetadataDeployService#installBundles(java.util.Collection)
@@ -250,15 +250,11 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	 */
 	protected <T extends OpenmrsObject> ObjectDeployHandler<T> getHandler(Class<T> clazz) throws RuntimeException {
         // assumes there is only one ObjectDeployHandlers component
-		ObjectDeployHandler<T> handler = objectDeployHandlers.getHandlers().get(clazz);
+		ObjectDeployHandler<T> handler = Context.getRegisteredComponents(ObjectDeployHandlers.class).get(0).getHandlers().get(clazz);
 		if (handler != null) {
 			return handler;
 		}
 
 		throw new RuntimeException("No handler class found for " + clazz.getName());
 	}
-
-    public void setObjectDeployHandlers(ObjectDeployHandlers objectDeployHandlers) {
-        this.objectDeployHandlers = objectDeployHandlers;
-    }
 }
