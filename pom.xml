@@ -13,6 +13,9 @@
 		<developer>
 			<name>I-TECH</name>
 		</developer>
+        <developer>
+            <name>OpenMRS</name>
+        </developer>
 	</developers>
 
 	<organization>
@@ -21,9 +24,9 @@
 	</organization>
 
 	<scm>
-		<connection>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</connection>
-		<developerConnection>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</developerConnection>
-		<url>scm:git:git@github.com:I-TECH/openmrs-module-metadatadeploy.git</url>
+        <connection>scm:git:git@github.com:openmrs/openmrs-module-metadatadeploy.git</connection>
+        <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-metadatadeploy.git</developerConnection>
+        <url>scm:git:https://github.com/openmrs/openmrs-module-metadatadeploy</url>
 		<tag>HEAD</tag>
 	</scm>
 
