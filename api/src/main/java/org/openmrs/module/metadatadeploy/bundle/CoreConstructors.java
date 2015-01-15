@@ -17,6 +17,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.openmrs.Concept;
+import org.openmrs.ConceptNameTag;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -64,6 +65,21 @@ public class CoreConstructors {
 		obj.setName(name);
 		obj.setDescription(description);
 		obj.setHl7Code(hl7Code);
+		obj.setUuid(uuid);
+		return obj;
+	}
+
+	/**
+	 * Constructs a ConceptNameTag
+	 * @param tag
+	 * @param description
+	 * @param uuid
+	 * @return the transient object
+	 */
+	public static ConceptNameTag conceptNameTag(String tag, String description, String uuid) {
+		ConceptNameTag obj = new ConceptNameTag();
+		obj.setTag(tag);
+		obj.setDescription(description);
 		obj.setUuid(uuid);
 		return obj;
 	}
