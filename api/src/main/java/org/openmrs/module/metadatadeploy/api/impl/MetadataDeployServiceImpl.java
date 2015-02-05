@@ -110,7 +110,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 	/**
 	 * @see MetadataDeployService#installPackage(String, ClassLoader, String)
 	 */
-	public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException {
+	public boolean installPackage(String filename, ClassLoader loader, String groupUuid, ImportMode importMode) throws APIException {
 		Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(filename);
 		if (!matcher.matches()) {
 			throw new APIException("Filename must match PackageNameWithNoSpaces-X.zip");
@@ -119,7 +119,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		Integer version = Integer.valueOf(matcher.group(1));
 
 		ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(groupUuid);
-		if (installed != null && installed.getVersion() >= version) {
+		if (installed != null && installed.getVersion() >= version && installed.getDateImported() != null) {
 			log.info("Metadata package " + filename + " is already installed with version " + installed.getVersion());
 			return false;
 		}
@@ -130,7 +130,7 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 
 		try {
 			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
-			metadataImporter.setImportConfig(ImportConfig.valueOf(ImportMode.MIRROR));
+			metadataImporter.setImportConfig(ImportConfig.valueOf(importMode));
 			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
 			metadataImporter.importPackage();
 
@@ -141,6 +141,14 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 			throw new APIException("Failed to install metadata package " + filename, ex);
 		}
 	}
+
+
+    /**
+     * @see MetadataDeployService#installPackage(String, ClassLoader, String)
+     */
+    public boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException {
+        return installPackage(filename, loader, groupUuid, ImportMode.MIRROR);
+    }
 
 	/**
 	 * @see MetadataDeployService#installObject(org.openmrs.OpenmrsObject)

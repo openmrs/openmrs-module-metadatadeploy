@@ -14,6 +14,8 @@
 
 package org.openmrs.module.metadatadeploy.bundle;
 
+import org.openmrs.module.metadatasharing.ImportMode;
+
 /**
  * Describes a metadata package (MDS)
  */
@@ -24,6 +26,22 @@ public class PackageDescriptor {
 	private ClassLoader classLoader;
 
 	private String groupUuid;
+
+    private ImportMode importMode;
+
+    /**
+     * Constructs a package descriptor
+     * @param filename the filename
+     * @param classLoader the classLoader
+     * @param groupUuid the group UUID
+     * @param importMode the import mode to use when importing
+     */
+    public PackageDescriptor(String filename, ClassLoader classLoader, String groupUuid, ImportMode importMode) {
+        this.filename = filename;
+        this.classLoader = classLoader;
+        this.groupUuid = groupUuid;
+        this.importMode = importMode;
+    }
 
 	/**
 	 * Constructs a package descriptor
@@ -60,4 +78,8 @@ public class PackageDescriptor {
 	public String getGroupUuid() {
 		return groupUuid;
 	}
+
+    public ImportMode getImportMode() {
+        return importMode;
+    }
 }

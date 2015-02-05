@@ -35,6 +35,7 @@ import org.openmrs.VisitType;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.SerializingCustomDatatype;
 import org.openmrs.customdatatype.datatype.FreeTextDatatype;
+import org.openmrs.module.metadatasharing.ImportMode;
 import org.openmrs.patient.IdentifierValidator;
 import org.openmrs.patient.UnallowedIdentifierException;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -236,11 +237,12 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void packageFile() {
-		PackageDescriptor obj = CoreConstructors.packageFile("xxx.zip", getClass().getClassLoader(), "obj-uuid");
+		PackageDescriptor obj = CoreConstructors.packageFile("xxx.zip", getClass().getClassLoader(), "obj-uuid", ImportMode.PARENT_AND_CHILD);
 
 		Assert.assertThat(obj.getFilename(), is("xxx.zip"));
 		Assert.assertThat(obj.getClassLoader(), is(getClass().getClassLoader()));
 		Assert.assertThat(obj.getGroupUuid(), is("obj-uuid"));
+        Assert.assertThat(obj.getImportMode(), is(ImportMode.PARENT_AND_CHILD));
 	}
 
 	/**

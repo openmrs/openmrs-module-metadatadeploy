@@ -18,6 +18,7 @@ import org.openmrs.OpenmrsObject;
 import org.openmrs.api.APIException;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
+import org.openmrs.module.metadatasharing.ImportMode;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -36,13 +37,25 @@ public interface MetadataDeployService {
 	 */
 	void installBundles(Collection<MetadataBundle> bundles) throws APIException;
 
-	/**
+    /**
+     * Installs a MDS package if it has not been installed yet or the installed version is out of date
+     * @param filename the package filename
+     * @param loader the class loader to use for loading the package
+     * @param groupUuid the package group UUID
+     * @param importMode the import mode to use
+     * @return whether package was installed
+     * @throws APIException if an error occurs
+     */
+    boolean installPackage(String filename, ClassLoader loader, String groupUuid, ImportMode importMode) throws APIException;
+
+    /**
 	 * Installs a MDS package if it has not been installed yet or the installed version is out of date
 	 * @param filename the package filename
 	 * @param loader the class loader to use for loading the package
 	 * @param groupUuid the package group UUID
 	 * @return whether package was installed
 	 * @throws APIException if an error occurs
+     * @should import using ImportMode.MIRROR
 	 */
 	boolean installPackage(String filename, ClassLoader loader, String groupUuid) throws APIException;
 

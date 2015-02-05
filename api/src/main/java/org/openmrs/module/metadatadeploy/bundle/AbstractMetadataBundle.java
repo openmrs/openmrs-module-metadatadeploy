@@ -22,6 +22,7 @@ import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
 import org.openmrs.module.metadatadeploy.sync.SyncResult;
+import org.openmrs.module.metadatasharing.ImportMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -41,8 +42,8 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 */
 	protected void install(PackageDescriptor pkg) {
 		ClassLoader loader = pkg.getClassLoader() != null ? pkg.getClassLoader() : this.getClass().getClassLoader();
-
-		deployService.installPackage(pkg.getFilename(), loader, pkg.getGroupUuid());
+        ImportMode importMode = pkg.getImportMode() != null ? pkg.getImportMode() : ImportMode.MIRROR;
+		deployService.installPackage(pkg.getFilename(), loader, pkg.getGroupUuid(), importMode);
 	}
 
 	/**

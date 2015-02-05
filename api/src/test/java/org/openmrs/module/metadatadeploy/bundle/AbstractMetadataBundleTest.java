@@ -26,6 +26,7 @@ import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
 import org.openmrs.module.metadatadeploy.sync.SyncResult;
+import org.openmrs.module.metadatasharing.ImportMode;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,7 +61,24 @@ public class AbstractMetadataBundleTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
 	}
 
-	/**
+    /**
+     * @see AbstractMetadataBundle#install(PackageDescriptor)
+     */
+    @Test
+    public void install_package_with_import_mode() {
+        final String TEST_PACKAGE_GROUP_UUID = "5c7fd8e7-e9a5-43a2-8ba5-c7694fc8db4a";
+        final ClassLoader loader = getClass().getClassLoader();
+        final String TEST_PACKAGE_FILENAME = "test-package-1.zip";
+
+        PackageDescriptor pkg1 = new PackageDescriptor(TEST_PACKAGE_FILENAME, loader, TEST_PACKAGE_GROUP_UUID, ImportMode.PARENT_AND_CHILD);
+        emptyBundle.install(pkg1);
+
+        // Check contained visit type was installed
+        Assert.assertThat(MetadataUtils.possible(VisitType.class, "3371a4d4-f66f-4454-a86d-92c7b3da990c"), notNullValue());
+    }
+
+
+    /**
 	 * @see AbstractMetadataBundle#install(org.openmrs.module.metadatadeploy.source.ObjectSource)
 	 */
 	@Test

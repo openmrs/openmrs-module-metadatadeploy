@@ -40,6 +40,7 @@ import org.openmrs.VisitType;
 import org.openmrs.customdatatype.CustomDatatype;
 import org.openmrs.customdatatype.datatype.FreeTextDatatype;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.metadatasharing.ImportMode;
 import org.openmrs.patient.IdentifierValidator;
 
 import java.util.Collection;
@@ -291,6 +292,18 @@ public class CoreConstructors {
 	public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid) {
 		return new PackageDescriptor(filename, classLoader, groupUuid);
 	}
+
+    /**
+     * Constructs a package descriptor
+     * @param filename the name
+     * @param classLoader the description
+     * @param groupUuid the group UUID
+     * @param importMode the import mode to use
+     * @return the package descriptor
+     */
+    public static PackageDescriptor packageFile(String filename, ClassLoader classLoader, String groupUuid, ImportMode importMode) {
+        return new PackageDescriptor(filename, classLoader, groupUuid, importMode);
+    }
 
 	/**
 	 * Constructs a patient identifier type
