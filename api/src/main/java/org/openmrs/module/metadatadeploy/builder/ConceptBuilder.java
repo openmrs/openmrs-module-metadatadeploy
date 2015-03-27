@@ -59,6 +59,19 @@ public class ConceptBuilder {
             ConceptNameTag tagObject = MetadataUtils.existing(ConceptNameTag.class, tag);
             conceptName.addTag(tagObject);
         }
+
+        // if this is the first name we add for a locale, mark it as localePreferred
+        boolean anyInLocale = false;
+        for (ConceptName candidate : entity.getNames()) {
+            if (candidate.getLocale().equals(locale)) {
+                anyInLocale = true;
+                break;
+            }
+        }
+        if (!anyInLocale) {
+            conceptName.setLocalePreferred(true);
+        }
+
         entity.addName(conceptName);
         return this;
     }
