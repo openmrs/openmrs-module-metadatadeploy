@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.Date;
 
 /**
- * Handler that lets you fetch ConceptClass
+ * Handler that lets you fetch or create ConceptClasses
  */
 @Handler(supports = ConceptClass.class)
 public class ConceptClassDeployHandler extends AbstractObjectDeployHandler<ConceptClass> {
