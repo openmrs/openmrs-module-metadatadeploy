@@ -18,7 +18,7 @@ import java.util.Locale;
  */
 public class ConceptBuilder {
 
-    private Concept entity;
+    protected Concept entity;
 
     public ConceptBuilder(String uuid) {
         entity = new Concept();

@@ -32,6 +32,7 @@ import org.openmrs.module.metadatadeploy.builder.ConceptBuilder;
 import org.openmrs.module.metadatadeploy.builder.ConceptDescriptionBuilder;
 import org.openmrs.module.metadatadeploy.builder.ConceptMapBuilder;
 import org.openmrs.module.metadatadeploy.builder.ConceptNameBuilder;
+import org.openmrs.module.metadatadeploy.builder.ConceptNumericBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -105,6 +106,25 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
         numeric.setHiAbsolute(10d);
         numeric.setPrecise(false);
         deployService.installObject(numeric);
+
+        ConceptNumeric created = (ConceptNumeric) conceptService.getConceptByUuid(UUID);
+        assertThat(created.getLowAbsolute(), is(1d));
+        assertThat(created.getHiAbsolute(), is(10d));
+        assertThat(created.getPrecise(), is(false));
+        assertThat(created.getName().getName(), is("Favorite single digit number"));
+    }
+
+    @Test
+    public void testCreateNumericUsingBuilder() throws Exception {
+        deployService.installObject(new ConceptNumericBuilder(UUID)
+                .datatype(conceptService.getConceptDatatypeByName("Numeric"))
+                .conceptClass(existing(ConceptClass.class, "a82ef63c-e4e4-48d6-988a-fdd74d7541a7"))
+                .name(new ConceptName("Favorite single digit number", Locale.ENGLISH))
+                .description(new ConceptDescription("1-10", Locale.ENGLISH))
+                .lowAbsolute(1d)
+                .hiAbsolute(10d)
+                .precise(false)
+                .build());
 
         ConceptNumeric created = (ConceptNumeric) conceptService.getConceptByUuid(UUID);
         assertThat(created.getLowAbsolute(), is(1d));
