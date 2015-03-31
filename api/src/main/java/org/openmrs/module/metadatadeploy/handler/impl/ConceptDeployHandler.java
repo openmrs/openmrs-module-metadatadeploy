@@ -94,25 +94,12 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
 
     @Override
     public void overwrite(Concept incoming, Concept existing) {
-        merge(existing, incoming);
+        ObjectUtils.overwrite(incoming, existing, excludeFields.get(Concept.class));
+        mergeCollection(existing.getNames(true), incoming.getNames(true), excludeFields.get(ConceptName.class));
+        mergeCollection(existing.getDescriptions(), incoming.getDescriptions(), excludeFields.get(ConceptDescription.class));
     }
 
-    private <T extends OpenmrsObject> void merge(T existing, T incoming) {
-        Set<String> fieldsToExclude = excludeFields.get(existing.getClass());
-        if (fieldsToExclude == null) {
-            throw new IllegalStateException("Don't know what to do with class: " + existing.getClass());
-        }
-
-        ObjectUtils.overwrite(incoming, existing, fieldsToExclude);
-        if (existing instanceof Concept) {
-            Concept existingConcept = (Concept) existing;
-            Concept incomingConcept = (Concept) incoming;
-            mergeCollection(existingConcept.getNames(true), incomingConcept.getNames());
-            mergeCollection(existingConcept.getDescriptions(), incomingConcept.getDescriptions());
-        }
-    }
-
-    private <T extends OpenmrsObject> void mergeCollection(Collection<T> existing, Collection<T> incoming) {
+    private <T extends OpenmrsObject> void mergeCollection(Collection<T> existing, Collection<T> incoming, Set<String> fieldsToExclude) {
         Set<T> handled = new HashSet<T>();
         Set<T> incomingToAdd = new HashSet<T>();
         for (T incomingItem : incoming) {
@@ -120,7 +107,7 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
             if (existingItem == null) {
                 incomingToAdd.add(incomingItem);
             } else {
-                merge(existingItem, incomingItem);
+                ObjectUtils.overwrite(incomingItem, existingItem, fieldsToExclude);
                 handled.add(existingItem);
             }
         }
