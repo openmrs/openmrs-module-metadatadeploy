@@ -12,6 +12,7 @@
 	<logger name="org.hibernate.type"><level value="trace" /></logger>
 	<logger name="org.hibernate.jdbc"><level value="trace" /></logger>
 	-->
+	<logger name="org.openmrs.module.metadatadeploy.handler.impl.ConceptDeployHandler"><level value="info" /></logger>
 	<root>
 		<level value="warn" />
 		<appender-ref ref="stdout"/>

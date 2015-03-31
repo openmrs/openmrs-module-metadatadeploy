@@ -61,9 +61,6 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
     private static final String UUID = "f35c9fde-cdc3-11e4-9dcf-b36e1005e77b";
 
-    /**
-     * Tests creating, adding name and mapping, retiring, and unretiring
-     */
     @Test
     public void testCreate() {
         Concept initial = new ConceptBuilder(UUID)
@@ -188,6 +185,7 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
                         hasProperty("tags", containsInAnyOrder(Arrays.asList(
                                 hasProperty("tag", is("refapp-preferred"))
                         ))))));
+        assertThat(updated.getNames(true).size(), is(updated.getNames(false).size() + 1));
         assertThat(updated.getDescriptions().size(), is(1));
         assertThat(updated.getDescription(), allOf(
                 hasProperty("uuid", is("75bcd12e-cdc4-11e4-9dcf-b36e1005e77b")),

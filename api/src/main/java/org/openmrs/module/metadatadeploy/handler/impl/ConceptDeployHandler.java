@@ -14,6 +14,8 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDescription;
 import org.openmrs.ConceptName;
@@ -34,6 +36,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +45,8 @@ import java.util.Set;
  */
 @Handler(supports = { Concept.class, ConceptNumeric.class })
 public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
+
+    private final Log log = LogFactory.getLog(this.getClass());
 
 	@Autowired
 	@Qualifier("conceptService")
@@ -120,9 +125,41 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
             }
         }
 
-        for (T existingItem : existing) {
+        for (Iterator<T> iter = existing.iterator(); iter.hasNext(); ) {
+            T existingItem = iter.next();
             if (!handled.contains(existingItem)) {
-                delete(existingItem);
+                if (existingItem instanceof Voidable || existingItem instanceof Retireable) {
+                    voidOrRetire(existingItem);
+                }
+                else {
+                    StringBuilder descr = new StringBuilder();
+                    Concept c;
+                    if (existingItem instanceof ConceptName) {
+                        ConceptName cn = (ConceptName) existingItem;
+                        c = cn.getConcept();
+                        descr.append("\"").append(cn.getName()).append("\" (name in ")
+                                .append(cn.getLocale())
+                                .append(" with type=").append(cn.getConceptNameType())
+                                .append(" and localePreferred=").append(cn.getLocalePreferred())
+                                .append(")");
+                    } else if (existingItem instanceof ConceptDescription) {
+                        ConceptDescription cd = (ConceptDescription) existingItem;
+                        c = cd.getConcept();
+                        descr.append("\"").append(cd.getDescription()).append("\" (description in ")
+                                .append(cd.getLocale()).append(")");
+                    } else {
+                        c = null;
+                        descr.append(existingItem)
+                                .append(" (")
+                                .append(existingItem.getClass().getSimpleName())
+                                .append(")");
+                    }
+                    if (c != null) {
+                        descr.append(" from concept ").append(c.getUuid());
+                    }
+                    log.info("Metadata Deploy is removing " + descr);
+                    iter.remove();
+                }
             }
         }
 
@@ -142,7 +179,7 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
     }
 
 
-    private void delete(OpenmrsObject existing) {
+    private void voidOrRetire(OpenmrsObject existing) {
         if (existing instanceof Voidable) {
             Voidable voidable = (Voidable) existing;
             voidable.setVoided(true);
