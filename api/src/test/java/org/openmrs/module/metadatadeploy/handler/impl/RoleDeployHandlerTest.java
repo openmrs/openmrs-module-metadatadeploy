@@ -24,11 +24,12 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.privilege;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.role;
@@ -55,9 +56,9 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Privilege privilege4 = deployService.installObject(privilege("Privilege4", "Testing"));
 
 		// Check installing new (Role2 inherits from Role1)
-		Role role1 = deployService.installObject(role("Role1", "New desc", null, idSet("Privilege1")));
-		Role role2 = deployService.installObject(role("Role2", "New desc", idSet("Role1"), idSet("Privilege2", "Privilege3")));
-		Role role3 = deployService.installObject(role("Role3", "New desc", idSet("Role1", "Role2"), idSet("Privilege4")));
+		Role role1 = deployService.installObject(role("Role1", "New desc", null, idSet("Privilege1"), "0689d5d0-e39b-11e4-b571-0800200c9a66"));
+		Role role2 = deployService.installObject(role("Role2", "New desc", idSet("Role1"), idSet("Privilege2", "Privilege3"), "20b709a0-e39b-11e4-b571-0800200c9a66"));
+		Role role3 = deployService.installObject(role("Role3", "New desc", idSet("Role1", "Role2"), idSet("Privilege4"), "29f97d90-e39b-11e4-b571-0800200c9a66"));
 
 		// Check everything can be persisted
 		Context.flushSession();
@@ -66,6 +67,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(created.getDescription(), is("New desc"));
 		Assert.assertThat(created.getInheritedRoles(), containsInAnyOrder(role1, role2));
 		Assert.assertThat(created.getPrivileges(), containsInAnyOrder(privilege4));
+        Assert.assertThat(created.getUuid(), is("29f97d90-e39b-11e4-b571-0800200c9a66"));
 
 		// Check updating existing
 		Role role3b = deployService.installObject(role("Role3", "Updated desc", idSet("Role2"), null)); // No longer inherits Role1

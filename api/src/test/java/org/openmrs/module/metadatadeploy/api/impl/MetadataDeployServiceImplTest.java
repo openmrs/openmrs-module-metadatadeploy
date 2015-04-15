@@ -26,7 +26,6 @@ import org.openmrs.VisitType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
-import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
@@ -40,8 +39,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
-import static org.hamcrest.Matchers.*;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounterType;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.location;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.privilege;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.role;
 
 /**
  * Tests for {@link MetadataDeployServiceImpl}
@@ -233,10 +242,10 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	public static class TestBundle1 extends AbstractMetadataBundle {
 		@Override
 		public void install() {
-			install(privilege("Test Privilege 1", "Testing"));
+			install(privilege("Test Privilege 1", "Testing", "737b6460-e39b-11e4-b571-0800200c9a66"));
 
-			install(role("Test Role 1", "Testing", null, idSet("Test Privilege 1")));
-			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), null));
+			install(role("Test Role 1", "Testing", null, idSet("Test Privilege 1"), "fc532160-e39b-11e4-b571-0800200c9a66"));
+			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), null, "0f56fd40-e39c-11e4-b571-0800200c9a66"));
 
 			install(encounterType("Test Encounter", "Testing", uuid("enc-type-uuid")));
 		}
@@ -247,10 +256,10 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 	public static class TestBundle2 extends AbstractMetadataBundle {
 		@Override
 		public void install() {
-			install(privilege("Test Privilege 1", "New description"));
-			install(privilege("Test Privilege 2", "Testing"));
+			install(privilege("Test Privilege 1", "New description", "737b6460-e39b-11e4-b571-0800200c9a66"));
+			install(privilege("Test Privilege 2", "Testing", "7c764800-e39b-11e4-b571-0800200c9a66"));
 
-			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), idSet("Test Privilege 1", "Test Privilege 2")));
+			install(role("Test Role 2", "Inherits from role 1", idSet("Test Role 1"), idSet("Test Privilege 1", "Test Privilege 2"), "0f56fd40-e39c-11e4-b571-0800200c9a66"));
 
 			install(form("Test Form #1", "Testing", uuid("enc-type-uuid"), "1", uuid("form1-uuid")));
 		}

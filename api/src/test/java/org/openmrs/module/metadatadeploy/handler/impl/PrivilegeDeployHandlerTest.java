@@ -40,18 +40,20 @@ public class PrivilegeDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void integration() {
 		// Check installing new
-		deployService.installObject(privilege("Privilege", "New desc"));
+		deployService.installObject(privilege("Privilege", "New desc", "16c908e0-e39a-11e4-b571-0800200c9a66"));
 
 		Context.flushSession(); // Make sure it gets persisted before we try evicting it later
 
 		Privilege created = Context.getUserService().getPrivilege("Privilege");
 		Assert.assertThat(created.getDescription(), is("New desc"));
+        Assert.assertThat(created.getUuid(), is("16c908e0-e39a-11e4-b571-0800200c9a66"));
 
 		// Check updating existing
-		deployService.installObject(privilege("Privilege", "Updated desc"));
+		deployService.installObject(privilege("Privilege", "Updated desc", "16c908e0-e39a-11e4-b571-0800200c9a66"));
 
 		Privilege updated = Context.getUserService().getPrivilege("Privilege");
 		Assert.assertThat(updated.getDescription(), is("Updated desc"));
+        // note that we aren't allowed to overwrite uuid
 
 		// Check uninstall removes
 		deployService.uninstallObject(deployService.fetchObject(Privilege.class, "Privilege"), "Testing");
@@ -59,7 +61,7 @@ public class PrivilegeDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(Context.getUserService().getPrivilege("Privilege"), nullValue());
 
 		// Check re-install unretires
-		deployService.installObject(privilege("Privilege", "Unretired desc"));
+		deployService.installObject(privilege("Privilege", "Unretired desc", "16c908e0-e39a-11e4-b571-0800200c9a66"));
 
 		Privilege unretired = Context.getUserService().getPrivilege("Privilege");
 		Assert.assertThat(unretired.getDescription(), is("Unretired desc"));

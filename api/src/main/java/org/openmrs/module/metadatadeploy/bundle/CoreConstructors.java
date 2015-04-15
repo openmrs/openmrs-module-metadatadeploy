@@ -16,6 +16,7 @@ package org.openmrs.module.metadatadeploy.bundle;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptNameTag;
@@ -380,18 +381,33 @@ public class CoreConstructors {
 		return obj;
 	}
 
-	/**
-	 * Constructs a privilege
-	 * @param privilege the privilege
-	 * @param description the description
-	 * @return the transient object
-	 */
-	public static Privilege privilege(String privilege, String description) {
-		Privilege obj = new Privilege();
-		obj.setPrivilege(privilege);
-		obj.setDescription(description);
-		return obj;
-	}
+    /**
+     * Constructs a privilege
+     * @param privilege the privilege
+     * @param description the description
+     * @return the transient object
+     */
+    public static Privilege privilege(String privilege, String description, String uuid) {
+        Privilege obj = new Privilege();
+        obj.setPrivilege(privilege);
+        obj.setDescription(description);
+
+        if (StringUtils.isNotBlank(uuid)) {
+            obj.setUuid(uuid);
+        }
+
+        return obj;
+    }
+
+    /**
+     * Constructs a privilege
+     * @param privilege the privilege
+     * @param description the description
+     * @return the transient object
+     */
+    public static Privilege privilege(String privilege, String description) {
+        return privilege(privilege, description, null);
+    }
 
 	/**
 	 * Constructs a program
@@ -441,10 +457,14 @@ public class CoreConstructors {
 	 * @param privileges the privileges
 	 * @return the transient object
 	 */
-	public static Role role(String role, String description, Set<String> inherited, Set<String> privileges) {
+	public static Role role(String role, String description, Set<String> inherited, Set<String> privileges, String uuid) {
 		Role obj = new Role();
 		obj.setRole(role);
 		obj.setDescription(description);
+
+        if (StringUtils.isNotBlank(uuid)) {
+            obj.setUuid(uuid);
+        }
 
 		if (CollectionUtils.isNotEmpty(inherited)) {
 			obj.setInheritedRoles((Set) CollectionUtils.collect(inherited, new Transformer() {
@@ -465,6 +485,18 @@ public class CoreConstructors {
 
 		return obj;
 	}
+
+    /**
+     * Constructs a role
+     * @param role the role
+     * @param description the description
+     * @param inherited the inherited roles
+     * @param privileges the privileges
+     * @return the transient object
+     */
+    public static Role role(String role, String description, Set<String> inherited, Set<String> privileges) {
+        return role(role, description, inherited, privileges, null);
+    }
 
 	/**
 	 * Constructs a visit attribute type
