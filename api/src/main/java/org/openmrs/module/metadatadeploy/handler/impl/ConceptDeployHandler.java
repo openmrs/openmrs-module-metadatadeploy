@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDescription;
+import org.openmrs.ConceptMap;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.OpenmrsObject;
@@ -58,13 +59,16 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
         super();
         excludeFields = new HashMap<Class, Set<String>>();
         excludeFields.put(Concept.class, new HashSet<String>(Arrays.asList(
-                "conceptId", "names", "descriptions"
+                "conceptId", "names", "descriptions", "conceptMappings"
         )));
         excludeFields.put(ConceptName.class, new HashSet<String>(Arrays.asList(
                 "conceptNameId", "concept"
         )));
         excludeFields.put(ConceptDescription.class, new HashSet<String>(Arrays.asList(
                 "conceptDescriptionId", "concept"
+        )));
+        excludeFields.put(ConceptMap.class, new HashSet<String>(Arrays.asList(
+                "conceptMapId", "concept"
         )));
     }
 
@@ -97,6 +101,7 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
         ObjectUtils.overwrite(incoming, existing, excludeFields.get(Concept.class));
         mergeCollection(existing.getNames(true), incoming.getNames(true), excludeFields.get(ConceptName.class));
         mergeCollection(existing.getDescriptions(), incoming.getDescriptions(), excludeFields.get(ConceptDescription.class));
+        mergeCollection(existing.getConceptMappings(), incoming.getConceptMappings(), excludeFields.get(ConceptMap.class));
     }
 
     private <T extends OpenmrsObject> void mergeCollection(Collection<T> existing, Collection<T> incoming, Set<String> fieldsToExclude) {

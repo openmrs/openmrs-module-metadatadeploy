@@ -158,9 +158,13 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
                         .description("How the patient describes it")
                         .locale(Locale.ENGLISH)
                         .build())
-                .mapping(new ConceptMapBuilder("mapping-uuid")
+                .mapping(new ConceptMapBuilder("a361ab43-065b-40da-89a9-3a095de359af")
                         .type(sameAs)
                         .ensureTerm(snomed, "422625006")
+                        .build())
+                .mapping(new ConceptMapBuilder("new-mapping-uuid")
+                        .type(sameAs)
+                        .ensureTerm(snomed, "1234567890") // nonsensical, just for testing
                         .build())
                 .build();
 
@@ -191,14 +195,23 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
                 hasProperty("uuid", is("75bcd12e-cdc4-11e4-9dcf-b36e1005e77b")),
                 hasProperty("description", is("How the patient describes it")),
                 hasProperty("locale", is(Locale.ENGLISH))));
-        assertThat(updated.getConceptMappings().size(), is(1));
-        assertThat(updated.getConceptMappings().iterator().next(), allOf(
-                hasProperty("conceptMapType", hasProperty("name", is("same-as"))),
-                hasProperty("conceptReferenceTerm", allOf(
-                        hasProperty("code", is("422625006")),
-                        hasProperty("conceptSource", hasProperty("uuid", is("j3nfjk33-639f-4cb4-961f-1e025b908433")))
-                ))
-        ));
+        assertThat(updated.getConceptMappings(), containsInAnyOrder(
+                allOf(
+                        hasProperty("uuid", is("a361ab43-065b-40da-89a9-3a095de359af")),
+                        hasProperty("conceptMapType", hasProperty("name", is("same-as"))),
+                        hasProperty("conceptReferenceTerm", allOf(
+                                hasProperty("code", is("422625006")),
+                                hasProperty("conceptSource", hasProperty("uuid", is("j3nfjk33-639f-4cb4-961f-1e025b908433")))
+                        ))
+                ),
+                allOf(
+                        hasProperty("uuid", is("new-mapping-uuid")),
+                        hasProperty("conceptMapType", hasProperty("name", is("same-as"))),
+                        hasProperty("conceptReferenceTerm", allOf(
+                                hasProperty("code", is("1234567890")),
+                                hasProperty("conceptSource", hasProperty("uuid", is("j3nfjk33-639f-4cb4-961f-1e025b908433")))
+                        ))
+                )));
 
         // Check everything can be persisted
         Context.flushSession();
