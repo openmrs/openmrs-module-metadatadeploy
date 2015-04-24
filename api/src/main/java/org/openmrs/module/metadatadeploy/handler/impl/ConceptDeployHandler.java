@@ -77,7 +77,14 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
 	 */
 	@Override
 	public Concept fetch(String identifier) {
-		return conceptService.getConceptByUuid(identifier);
+        Concept concept = conceptService.getConceptByUuid(identifier);
+
+        // the core API doesn't always return ConceptNumeric for numeric concepts
+        if (concept != null && concept.getDatatype().isNumeric() && !(concept instanceof ConceptNumeric)) {
+            concept = Context.getConceptService().getConceptNumeric(concept.getId());
+        }
+
+        return concept;
 	}
 
 	/**

@@ -218,6 +218,25 @@ public class ConceptDeployHandlerTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    public void testUpdateNumeric() throws Exception {
+        String weightUuid = "c607c80f-1ea9-4da3-bb88-6276ce8868dd";
+        deployService.installObject(new ConceptNumericBuilder(weightUuid)
+                .datatype(conceptService.getConceptDatatypeByName("Numeric"))
+                .conceptClass(existing(ConceptClass.class, "a82ef63c-e4e4-48d6-988a-fdd74d7541a7")) // doesn't matter which
+                .name(new ConceptName("WEIGHT (KG)", Locale.ENGLISH))
+                .lowAbsolute(0d)
+                .hiAbsolute(null) // change this just to see if it works
+                .precise(true)
+                .build());
+
+        ConceptNumeric updated = (ConceptNumeric) conceptService.getConceptByUuid(weightUuid);
+        assertThat(updated.getLowAbsolute(), is(0d));
+        assertThat(updated.getHiAbsolute(), nullValue());
+        assertThat(updated.getPrecise(), is(true));
+        assertThat(updated.getName().getName(), is("WEIGHT (KG)"));
+    }
+
+    @Test
     public void testRetire() throws Exception {
         executeDataSet("concept/existingConcepts.xml");
         deployService.uninstallObject(deployService.fetchObject(Concept.class, UUID), "Testing");
