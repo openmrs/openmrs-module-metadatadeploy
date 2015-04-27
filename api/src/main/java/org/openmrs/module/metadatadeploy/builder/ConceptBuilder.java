@@ -107,6 +107,7 @@ public class ConceptBuilder {
         for (Concept member : members) {
             entity.addSetMember(member);
         }
+        entity.setSet(true);
         return this;
     }
 
