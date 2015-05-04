@@ -38,6 +38,14 @@ public interface MetadataDeployService {
 	void installBundles(Collection<MetadataBundle> bundles) throws APIException;
 
     /**
+     * Installs a bundle and all it's @Required dependencies
+     * @param bundle the bundle to install
+     * @throws APIException if an error occurs
+     */
+    void installBundle(MetadataBundle bundle) throws APIException;
+
+
+    /**
      * Installs a MDS package if it has not been installed yet or the installed version is out of date
      * @param filename the package filename
      * @param loader the class loader to use for loading the package

@@ -70,7 +70,18 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		}
 	}
 
-	/**
+    public void installBundle(MetadataBundle bundle) throws APIException {
+
+        Map<Class<? extends MetadataBundle>, MetadataBundle> all = new HashMap<Class<? extends MetadataBundle>, MetadataBundle>();
+        for (MetadataBundle b: Context.getRegisteredComponents(MetadataBundle.class)) {
+            all.put(b.getClass(), b);
+        }
+
+        Set<MetadataBundle> installed = new HashSet<MetadataBundle>();
+        installBundle(bundle, all, installed);
+    }
+
+    /**
 	 * Installs a metadata bundle by recursively installing it's required bundles
 	 * @param bundle the bundle
 	 * @param all the map of all bundles and their ids
