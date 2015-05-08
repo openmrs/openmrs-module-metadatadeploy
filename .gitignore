@@ -1,10 +1,9 @@
 .project
 .settings
-api/.classpath
+.classpath
 api/target
-omod/.classpath
+api-1.10/target
 omod/target
-test/.classpath
 test/target
 .idea
 *iml
