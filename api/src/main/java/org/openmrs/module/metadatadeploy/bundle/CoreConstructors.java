@@ -233,18 +233,17 @@ public class CoreConstructors {
      * @return the transient object
      */
     public static Location location(String name, String description, String uuid, String parentLocationUuid, Collection<String> tagUuids) {
-        Location obj = new Location();
-        obj.setName(name);
-        obj.setDescription(description);
-        obj.setUuid(uuid);
+        Location obj = location(name, description, uuid);
         if (parentLocationUuid != null) {
             obj.setParentLocation(MetadataUtils.existing(Location.class, parentLocationUuid));
         }
+		Set<LocationTag> tags = new HashSet<LocationTag>();
         if (tagUuids != null) {
             for (String tagUuid : tagUuids) {
-                obj.addTag(MetadataUtils.existing(LocationTag.class, tagUuid));
+                tags.add(MetadataUtils.existing(LocationTag.class, tagUuid));
             }
         }
+		obj.setTags(tags);
         return obj;
     }
 
