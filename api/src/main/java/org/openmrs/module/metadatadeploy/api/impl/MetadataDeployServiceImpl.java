@@ -273,6 +273,9 @@ public class MetadataDeployServiceImpl extends BaseOpenmrsService implements Met
 		if (handler != null) {
 			return handler;
 		}
+		if (clazz.getSimpleName().contains("_$$")) {
+			return getHandler((Class<T>) clazz.getSuperclass());
+		}
 
 		throw new RuntimeException("No handler class found for " + clazz.getName());
 	}

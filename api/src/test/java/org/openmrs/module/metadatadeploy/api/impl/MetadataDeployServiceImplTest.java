@@ -17,6 +17,7 @@ package org.openmrs.module.metadatadeploy.api.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Privilege;
@@ -30,6 +31,7 @@ import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.MetadataBundle;
 import org.openmrs.module.metadatadeploy.bundle.Requires;
+import org.openmrs.module.metadatadeploy.handler.impl.ConceptDeployHandler;
 import org.openmrs.module.metadatadeploy.handler.impl.ProgramDeployHandler;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.aop.framework.Advised;
@@ -226,6 +228,20 @@ public class MetadataDeployServiceImplTest extends BaseModuleContextSensitiveTes
 		MetadataDeployServiceImpl impl = getProxyTarget(deployService);
 
 		Assert.assertThat(impl.getHandler(Program.class), instanceOf(ProgramDeployHandler.class));
+	}
+
+	/**
+	 * @see MetadataDeployServiceImpl#getHandler(Class)
+	 */
+	@Test
+	public void getHandler_shouldReturnHandlerForSuperclassOfProxy() throws Exception {
+		Class<? extends Concept> clazz = Context.getConceptService().getConcept(21).getAnswers().iterator().next().getAnswerConcept().getClass();
+		MetadataDeployServiceImpl impl = getProxyTarget(deployService);
+
+		// Verify that this test is actually going to test what it's supposed to be testing
+		Assert.assertTrue(clazz.getSimpleName().contains("_$$"));
+
+		Assert.assertThat(impl.getHandler(clazz), instanceOf(ConceptDeployHandler.class));
 	}
 
 	/**
