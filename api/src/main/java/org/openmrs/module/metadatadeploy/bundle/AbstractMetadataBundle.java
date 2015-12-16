@@ -17,12 +17,25 @@ package org.openmrs.module.metadatadeploy.bundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
+import org.openmrs.LocationAttributeType;
 import org.openmrs.OpenmrsMetadata;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.Privilege;
+import org.openmrs.Role;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
+import org.openmrs.module.metadatadeploy.descriptor.EncounterTypeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeTypeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.LocationDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.LocationTagDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.PatientIdentifierTypeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.PersonAttributeTypeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.PrivilegeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.RoleDescriptor;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
@@ -35,9 +48,15 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounterType;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.location;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.locationAttribute;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.packageFile;
 
 /**
@@ -194,5 +213,76 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 		log.warn("Installing Metadata Sharing package: " + filename);
 		install(packageFile(filename, null, groupUuid));
 		return true;
+	}
+
+	protected void install(EncounterTypeDescriptor d) {
+		install(encounterType(d.name(), d.description(), d.uuid()));
+	}
+
+	protected void install(LocationAttributeTypeDescriptor d) {
+		LocationAttributeType type = CoreConstructors.locationAttributeType(d.name(), d.description(), d.datatype(), d.datatypeConfig(), d.minOccurs(), d.maxOccurs(), d.uuid());
+		install(type);
+	}
+
+	protected void install(LocationDescriptor location) {
+
+		// First install the location and it's tags
+		String parentUuid = location.parent() == null ? null : location.parent().uuid();
+		List<String> tagUuids = new ArrayList<String>();
+		if (location.tags() != null) {
+			for (LocationTagDescriptor tagDescriptor : location.tags()) {
+				tagUuids.add(tagDescriptor.uuid());
+			}
+		}
+		install(location(location.name(), location.description(), location.uuid(), parentUuid, tagUuids));
+
+		// Then, install the location attribute(s) if applicable
+		if (location.attributes() != null) {
+			for (LocationAttributeDescriptor lad : location.attributes()) {
+				if (!lad.location().uuid().equals(location.uuid())) {
+					throw new IllegalStateException("Location Attribute with uuid " + lad.uuid() + " is configured with a different location than it the Location it is associated with");
+				}
+				install(locationAttribute(lad.location().uuid(), lad.type().uuid(), lad.value(), lad.uuid()));
+			}
+		}
+	}
+
+	protected void install(LocationTagDescriptor d) {
+		install(CoreConstructors.locationTag(d.name(), d.description(), d.uuid()));
+	}
+
+	protected void install(PatientIdentifierTypeDescriptor d) {
+		install(CoreConstructors.patientIdentifierType(d.name(), d.description(), d.format(), d.formatDescription(), d.validator(), d.locationBehavior(), d.required(), d.uuid()));
+	}
+
+	protected void install(PersonAttributeTypeDescriptor d) {
+		install(CoreConstructors.personAttributeType(d.name(), d.description(), d.format(), d.foreignKey(), d.searchable(), d.sortWeight(), d.uuid()));
+	}
+
+
+	protected void install(PrivilegeDescriptor d) {
+		install(CoreConstructors.privilege(d.privilege(), d.description(), d.uuid()));
+	}
+
+	protected void install(RoleDescriptor d) {
+		Role obj = new Role();
+		obj.setUuid(d.uuid());
+		obj.setRole(d.role());
+		obj.setDescription(d.description());
+		if (d.inherited() != null) {
+			Set<Role> inheritedRoles = new HashSet<Role>();
+			for (RoleDescriptor rd : d.inherited()) {
+				inheritedRoles.add(MetadataUtils.existing(Role.class, rd.uuid()));
+			}
+			obj.setInheritedRoles(inheritedRoles);
+		}
+		if (d.privileges() != null) {
+			Set<Privilege> privileges = new HashSet<Privilege>();
+			for (PrivilegeDescriptor pd : d.privileges()) {
+				privileges.add(MetadataUtils.existing(Privilege.class, pd.privilege()));
+			}
+			obj.setPrivileges(privileges);
+		}
+		install(obj);
 	}
 }
