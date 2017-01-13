@@ -32,6 +32,10 @@ import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.LocationDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.LocationTagDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.MetadataSetDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.MetadataSetMemberDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.MetadataSourceDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.MetadataTermMappingDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PatientIdentifierTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PersonAttributeTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PrivilegeDescriptor;
@@ -40,6 +44,8 @@ import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
 import org.openmrs.module.metadatadeploy.sync.SyncResult;
+import org.openmrs.module.metadatamapping.MetadataSet;
+import org.openmrs.module.metadatamapping.MetadataSource;
 import org.openmrs.module.metadatasharing.ImportMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,6 +64,10 @@ import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounte
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.location;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.locationAttribute;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.packageFile;
+import static org.openmrs.module.metadatadeploy.bundle.MetadataMappingConstructors.metadataSet;
+import static org.openmrs.module.metadatadeploy.bundle.MetadataMappingConstructors.metadataSetMember;
+import static org.openmrs.module.metadatadeploy.bundle.MetadataMappingConstructors.metadataSource;
+import static org.openmrs.module.metadatadeploy.bundle.MetadataMappingConstructors.metadataTermMapping;
 
 /**
  * Abstract base class for metadata bundle components
@@ -284,5 +294,23 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 			obj.setPrivileges(privileges);
 		}
 		install(obj);
+	}
+
+	protected void install(MetadataSourceDescriptor d) {
+		install(metadataSource(d.name(), d.description(), d.uuid()));
+	}
+
+	protected void install(MetadataTermMappingDescriptor d) {
+		install(metadataTermMapping(MetadataUtils.existing(MetadataSource.class, d.metadataSource().uuid()), d.code(), d
+				.metadataClass(), d.metadataUuid(), d.uuid()));
+	}
+
+	protected void install(MetadataSetDescriptor d) {
+		install(metadataSet(d.uuid()));
+	}
+
+	protected void install(MetadataSetMemberDescriptor d) {
+		install(metadataSetMember(MetadataUtils.existing(MetadataSet.class, d.metadataSet().uuid()), d.metadataClass(), d
+				.metadataUuid(), d.sortWeight(), d.uuid()));
 	}
 }
