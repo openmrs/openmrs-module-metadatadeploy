@@ -14,6 +14,8 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
+import java.lang.reflect.Method;
+
 import org.hibernate.SessionFactory;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
@@ -50,7 +52,7 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	public PersonAttributeType save(PersonAttributeType obj) {
 		// The regular save method in the person service does some interesting stuff to check name changes.. which breaks
 		// our way of replacing existing objects. Our workaround is to ask Hibernate directly to save the object
-		sessionFactory.getCurrentSession().saveOrUpdate(obj);
+		getCurrentSession().saveOrUpdate(obj);
 		return obj;
 
 		//return personService.savePersonAttributeType(obj);
@@ -71,5 +73,25 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	@Override
 	public void uninstall(PersonAttributeType obj, String reason) {
 		personService.retirePersonAttributeType(obj, reason);
+	}
+	
+	/**
+	 * Gets the current hibernate session while taking care of the hibernate 3 and 4 differences.
+	 * 
+	 * @return the current hibernate session.
+	 */
+	private org.hibernate.Session getCurrentSession() {
+		try {
+			return sessionFactory.getCurrentSession();
+		}
+		catch (NoSuchMethodError ex) {
+			try {
+				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
+				return (org.hibernate.Session)method.invoke(sessionFactory, null);
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Failed to get the current hibernate session", e);
+			}
+		}
 	}
 }

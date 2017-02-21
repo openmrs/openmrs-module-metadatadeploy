@@ -34,6 +34,8 @@ import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.idSet;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.privilege;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.role;
 
+import java.lang.reflect.Method;
+
 /**
  * Tests for {@link RoleDeployHandler}
  */
@@ -104,7 +106,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void integration_shouldWorkWithoutFlushes() {
-		sessionFactory.getCurrentSession().setFlushMode(FlushMode.MANUAL);
+		getCurrentSession().setFlushMode(FlushMode.MANUAL);
 
 		deployService.installObject(privilege("Privilege1", "Testing"));
 		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
@@ -115,7 +117,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
 
 		Context.flushSession();
-		sessionFactory.getCurrentSession().setFlushMode(FlushMode.AUTO);
+		getCurrentSession().setFlushMode(FlushMode.AUTO);
 	}
 
 	/**
@@ -143,5 +145,25 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Role role2 = MetadataUtils.existing(Role.class, "Role2");
 
 		Assert.assertThat(role2.getInheritedRoles(), contains(role1));
+	}
+	
+	/**
+	 * Gets the current hibernate session while taking care of the hibernate 3 and 4 differences.
+	 * 
+	 * @return the current hibernate session.
+	 */
+	private org.hibernate.Session getCurrentSession() {
+		try {
+			return sessionFactory.getCurrentSession();
+		}
+		catch (NoSuchMethodError ex) {
+			try {
+				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
+				return (org.hibernate.Session)method.invoke(sessionFactory, null);
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Failed to get the current hibernate session", e);
+			}
+		}
 	}
 }
