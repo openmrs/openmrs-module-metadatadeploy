@@ -27,15 +27,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.MissingMetadataException;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
-import org.openmrs.module.metadatadeploy.descriptor.EncounterTypeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.LocationAttributeTypeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.LocationDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.LocationTagDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.PatientIdentifierTypeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.PersonAttributeTypeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.PrivilegeDescriptor;
-import org.openmrs.module.metadatadeploy.descriptor.RoleDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.*;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
 import org.openmrs.module.metadatadeploy.sync.ObjectSynchronization;
@@ -284,5 +276,13 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 			obj.setPrivileges(privileges);
 		}
 		install(obj);
+	}
+
+	/**
+	 * Utility method to install a program metadata in an openmrs insatnce
+	 * @param d
+     */
+	protected void install(ProgramDescriptor d){
+		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.uuid()));
 	}
 }
