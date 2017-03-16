@@ -35,6 +35,7 @@ import org.openmrs.module.metadatadeploy.descriptor.LocationTagDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PatientIdentifierTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PersonAttributeTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PrivilegeDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.ProgramDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.RoleDescriptor;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
@@ -284,5 +285,13 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 			obj.setPrivileges(privileges);
 		}
 		install(obj);
+	}
+
+	/**
+	 * Utility method to install a program metadata in an openmrs insatnce
+	 * @param d
+     */
+	protected void install(ProgramDescriptor d){
+		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.uuid()));
 	}
 }
