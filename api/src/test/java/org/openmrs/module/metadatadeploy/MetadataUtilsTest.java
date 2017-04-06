@@ -14,6 +14,10 @@
 
 package org.openmrs.module.metadatadeploy;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Concept;
@@ -34,8 +38,6 @@ import org.openmrs.VisitAttributeType;
 import org.openmrs.VisitType;
 import org.openmrs.api.context.Context;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-
-import static org.hamcrest.Matchers.*;
 
 /**
  * Tests for {@link MetadataUtils}
@@ -189,7 +191,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void getLocation_shouldFetchByUuid() {
 		Location unknown = Context.getLocationService().getLocation(1);
-		Assert.assertThat(MetadataUtils.getLocation("dc5c1fcc-0459-4201-bf70-0b90535ba362"), is(unknown));
+		Assert.assertThat(MetadataUtils.getLocation("8d6c993e-c2cc-11de-8d13-0010c6dffd0f"), is(unknown));
 	}
 
 	/**
