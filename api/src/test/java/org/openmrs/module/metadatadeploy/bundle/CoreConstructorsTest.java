@@ -285,13 +285,15 @@ public class CoreConstructorsTest extends BaseModuleContextSensitiveTest {
 	public void program() {
 		// Existing concepts in test data
 		final String HIV_PROGRAM_UUID = "0a9afe04-088b-44ca-9291-0a8c3b5c96fa";
+		final String CIVIL_STATUS_UUID = "89ca642a-dab6-4f20-b712-e12ca4fc6d36";  // not a likely real program outcome, but an example for testing!
 
-		Program obj = CoreConstructors.program("name", "desc", HIV_PROGRAM_UUID, "obj-uuid");
+		Program obj = CoreConstructors.program("name", "desc", HIV_PROGRAM_UUID,  CIVIL_STATUS_UUID,"obj-uuid");
 
 		Assert.assertThat(obj.getName(), is("name"));
 		Assert.assertThat(obj.getDescription(), is("desc"));
 		Assert.assertThat(obj.getConcept(), is(Context.getConceptService().getConceptByUuid(HIV_PROGRAM_UUID)));
 		Assert.assertThat(obj.getUuid(), is("obj-uuid"));
+		Assert.assertThat(obj.getOutcomesConcept(), is(Context.getConceptService().getConceptByUuid(CIVIL_STATUS_UUID)));
 	}
 
 	/**

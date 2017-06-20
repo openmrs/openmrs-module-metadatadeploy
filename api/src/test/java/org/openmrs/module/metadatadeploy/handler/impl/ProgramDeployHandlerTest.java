@@ -46,26 +46,29 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		// Existing concepts in test data
 		final String HIV_PROGRAM_UUID = "0a9afe04-088b-44ca-9291-0a8c3b5c96fa";
 		final String MALARIA_PROGRAM_UUID = "f923524a-b90c-4870-a948-4125638606fd";
+		final String CIVIL_STATUS_UUID = "89ca642a-dab6-4f20-b712-e12ca4fc6d36";  // not a likely real program outcome, but an example for testing!
 
 		// Check installing new
-		deployService.installObject(program("Test Program", "Testing", HIV_PROGRAM_UUID, "obj1-uuid"));
+		deployService.installObject(program("Test Program", "Testing", HIV_PROGRAM_UUID, null, "obj1-uuid"));
 
 		Program created = Context.getProgramWorkflowService().getProgramByUuid("obj1-uuid");
 		Assert.assertThat(created.getName(), is("Test Program"));
 		Assert.assertThat(created.getDescription(), is("Testing"));
 		Assert.assertThat(created.getConcept(), is(Context.getConceptService().getConceptByUuid(HIV_PROGRAM_UUID)));
+		Assert.assertNull(created.getOutcomesConcept());
 
 		// Check updating existing
-		deployService.installObject(program("New name", "New desc", MALARIA_PROGRAM_UUID, "obj1-uuid"));
+		deployService.installObject(program("New name", "New desc", MALARIA_PROGRAM_UUID, CIVIL_STATUS_UUID,"obj1-uuid"));
 
 		Program updated = Context.getProgramWorkflowService().getProgramByUuid("obj1-uuid");
 		Assert.assertThat(updated.getId(), is(created.getId()));
 		Assert.assertThat(updated.getName(), is("New name"));
 		Assert.assertThat(updated.getDescription(), is("New desc"));
 		Assert.assertThat(updated.getConcept(), is(Context.getConceptService().getConceptByUuid(MALARIA_PROGRAM_UUID)));
+		Assert.assertThat(updated.getOutcomesConcept(), is(Context.getConceptService().getConceptByUuid(CIVIL_STATUS_UUID)));
 
 		// Check update existing when name conflicts
-		deployService.installObject(program("New name", "Diff desc", MALARIA_PROGRAM_UUID, "obj2-uuid"));
+		deployService.installObject(program("New name", "Diff desc", MALARIA_PROGRAM_UUID, null,"obj2-uuid"));
 		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
 		Assert.assertThat(updated.getName(), is("New name"));
 		Assert.assertThat(updated.getDescription(), is("Diff desc"));
@@ -91,7 +94,7 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		Assert.assertThat(Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid").isRetired(), is(true));
 
 		// Check re-install unretires
-		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_UUID, "obj2-uuid"));
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_UUID, null,"obj2-uuid"));
 
 		Program unretired = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
 		Assert.assertThat(unretired.getName(), is("Unretired name"));

@@ -27,6 +27,13 @@ public abstract class ProgramDescriptor extends MetadataDescriptor<Program> {
     public abstract String conceptUuid();
 
     /**
+     * Get the outcomes concept uuid as a String; override if this program has an outcomes concept
+     */
+    public String outcomesConceptUuid() {
+        return null;
+    }
+
+    /**
      * @see Descriptor#getDescribedType()
      */
     @Override

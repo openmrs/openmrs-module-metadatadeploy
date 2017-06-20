@@ -416,14 +416,24 @@ public class CoreConstructors {
 	 * @param uuid the UUID
 	 * @return the transient object
 	 */
-	public static Program program(String name, String description, String conceptUuid, String uuid) {
+	public static Program program(String name, String description, String conceptUuid, String outcomesConceptUuid, String uuid) {
 		Program obj = new Program();
 		obj.setName(name);
 		obj.setDescription(description);
 		obj.setConcept(MetadataUtils.existing(Concept.class, conceptUuid));
 		obj.setUuid(uuid);
+
+		if (StringUtils.isNotEmpty(outcomesConceptUuid)) {
+			obj.setOutcomesConcept(MetadataUtils.existing(Concept.class, outcomesConceptUuid));
+		}
+
 		return obj;
 	}
+
+	public static Program program(String name, String description, String conceptUuid, String uuid) {
+	 	return CoreConstructors.program(name, description, conceptUuid, null, uuid);
+	}
+
 
 	/**
 	 * Constructs a provider attribute type

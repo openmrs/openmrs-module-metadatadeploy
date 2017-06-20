@@ -292,6 +292,6 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * @param d
      */
 	protected void install(ProgramDescriptor d){
-		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.uuid()));
+		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.outcomesConceptUuid(), d.uuid()));
 	}
 }
