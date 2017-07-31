@@ -14,6 +14,10 @@
 
 package org.openmrs.module.metadatadeploy.bundle;
 
+import org.openmrs.api.db.hibernate.DbSessionFactory;
+
+import org.hibernate.SessionFactory;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +59,16 @@ import java.util.Set;
  */
 public class CoreConstructors {
 
+	/**
+	 * Constructs a dbsessionFactory source
+	 * @return the transient object
+	 */
+	public static DbSessionFactory dbSessionFactory(SessionFactory sessionFactory) {
+		DbSessionFactory obj = new DbSessionFactory();
+	      obj.getSessionFactory(sessionFactory);
+		     return obj;
+	}
+	
 	/**
 	 * Constructs a concept source
 	 * @param name the name
