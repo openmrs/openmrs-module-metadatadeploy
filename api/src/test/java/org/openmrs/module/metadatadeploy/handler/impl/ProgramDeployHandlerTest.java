@@ -50,6 +50,7 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		final String HIV_PROGRAM_CONCEPT_UUID = "0a9afe04-088b-44ca-9291-0a8c3b5c96fa";
 		final String MALARIA_PROGRAM_CONCEPT_UUID = "f923524a-b90c-4870-a948-4125638606fd";
 		final String CIVIL_STATUS_UUID = "89ca642a-dab6-4f20-b712-e12ca4fc6d36";  // not a likely real program outcome, but an example for testing!
+		final String ANOTHER_SAMPLE_CONCEPT_UUID = "0cbe2ed3-cd5f-4f46-9459-26127c9265ab";
 
 		// Check installing new
 		deployService.installObject(program("Test Program", "Testing", HIV_PROGRAM_CONCEPT_UUID, null, "obj1-uuid"));
@@ -100,18 +101,43 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 
 		ProgramWorkflowState state = workflow.getStates().iterator().next();
 		assertThat(state.getConcept().getUuid(), is(CIVIL_STATUS_UUID));
+		assertThat(state.getInitial(), is(true));
+		assertThat(state.getTerminal(), is(false));
 		assertThat(state.getUuid(), is("obj-state-uuid"));
+
+		// confirm that re-install of exact same program works and doesn't create multiple states
+		deployService.installObject(program("New name", "Diff desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid",
+				Collections.singleton(programWorkflow(CIVIL_STATUS_UUID, "obj-workflow-uuid" ,
+						Collections.singleton(programWorkflowState(CIVIL_STATUS_UUID, true, false, "obj-state-uuid"))))));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		assertThat(updated.getWorkflows().size(), is(1));
+		assertThat(updated.getWorkflows().iterator().next().getStates().size(), is(1));
+
+		// modify workflow and state
+		deployService.installObject(program("New name", "Diff desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid",
+				Collections.singleton(programWorkflow(ANOTHER_SAMPLE_CONCEPT_UUID, "obj-workflow-uuid" ,
+						Collections.singleton(programWorkflowState(CIVIL_STATUS_UUID, false, true, "obj-state-uuid"))))));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		assertThat(updated.getWorkflows().size(), is(1));
+		workflow = updated.getWorkflows().iterator().next();
+		assertThat(workflow.getConcept().getUuid(), is(ANOTHER_SAMPLE_CONCEPT_UUID));
+		assertThat(workflow.getStates().size(), is(1));
+		state = workflow.getStates().iterator().next();
+		assertThat(state.getInitial(), is(false));
+		assertThat(state.getTerminal(), is(true));
 
 		// Check uninstall retires
 		deployService.uninstallObject(deployService.fetchObject(Program.class, "obj2-uuid"), "Testing");
-
-		assertThat(Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid").isRetired(), is(true));
-		assertThat(Context.getProgramWorkflowService().getWorkflowByUuid("obj-workflow-uuid").isRetired(), is(true));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		assertThat(updated.isRetired(), is(true));
+		workflow = updated.getAllWorkflows().iterator().next();
+		assertThat(workflow.isRetired(), is(true));
+		assertThat(workflow.getStates().iterator().next().isRetired(), is(true));
 
 		// Check re-install unretires
-		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid"));
-
-		// TODO: should uninstall workflow
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid",
+				Collections.singleton(programWorkflow(ANOTHER_SAMPLE_CONCEPT_UUID, "obj-workflow-uuid" ,
+						Collections.singleton(programWorkflowState(CIVIL_STATUS_UUID, false, true, "obj-state-uuid"))))));
 
 		Program unretired = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
 		assertThat(unretired.getName(), is("Unretired name"));
@@ -120,6 +146,42 @@ public class ProgramDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		assertThat(unretired.getDateRetired(), nullValue());
 		assertThat(unretired.getRetiredBy(), nullValue());
 		assertThat(unretired.getRetireReason(), nullValue());
+		workflow = unretired.getAllWorkflows().iterator().next();
+		assertThat(workflow.isRetired(), is(false));
+		assertThat(workflow.getDateRetired(), nullValue());
+		assertThat(workflow.getRetiredBy(), nullValue());
+		assertThat(workflow.getRetireReason(), nullValue());
+		state = workflow.getStates().iterator().next();
+		assertThat(state.isRetired(), is(false));
+		assertThat(state.getDateRetired(), nullValue());
+		assertThat(state.getRetiredBy(), nullValue());
+		assertThat(state.getRetireReason(), nullValue());
+
+		// check that removing a state retires it
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid",
+				Collections.singleton(programWorkflow(ANOTHER_SAMPLE_CONCEPT_UUID, "obj-workflow-uuid" , null))));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		workflow = updated.getAllWorkflows().iterator().next();
+		assertThat(workflow.getStates().size(), is(1));
+		assertThat(workflow.getNonRetiredStateCount(), is(0));
+
+		// add the state back in
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid",
+				Collections.singleton(programWorkflow(ANOTHER_SAMPLE_CONCEPT_UUID, "obj-workflow-uuid" ,
+						Collections.singleton(programWorkflowState(CIVIL_STATUS_UUID, false, true, "obj-state-uuid"))))));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		workflow = updated.getAllWorkflows().iterator().next();
+		assertThat(workflow.getStates().size(), is(1));
+		assertThat(workflow.getNonRetiredStateCount(), is(1));
+
+		// now remove the workflow and state
+		deployService.installObject(program("Unretired name", "Unretired desc", MALARIA_PROGRAM_CONCEPT_UUID, null,"obj2-uuid", null));
+		updated = Context.getProgramWorkflowService().getProgramByUuid("obj2-uuid");
+		assertThat(updated.getWorkflows().size(), is(0));  // workflows only returns retired workflows
+		workflow = updated.getAllWorkflows().iterator().next();
+		assertThat(workflow.isRetired(), is(true));
+		assertThat(workflow.getStates().size(), is(1));
+		assertThat(workflow.getNonRetiredStateCount(), is(0));
 
 		// Check everything can be persisted
 		Context.flushSession();

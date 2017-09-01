@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -166,38 +165,6 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
             existing.add(incomingItem);
         }
     }
-
-
-    private <T extends OpenmrsObject> T findExisting(Collection<T> collection, T incomingItem) {
-        for (T candidate : collection) {
-            if (candidate.getUuid().equals(incomingItem.getUuid())) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-
-    private void voidOrRetire(OpenmrsObject existing) {
-        if (existing instanceof Voidable) {
-            Voidable voidable = (Voidable) existing;
-            voidable.setVoided(true);
-            voidable.setDateVoided(new Date());
-            voidable.setVoidReason("metadata deploy");
-            voidable.setVoidedBy(Context.getAuthenticatedUser());
-        }
-        else if (existing instanceof Retireable) {
-            Retireable retireable = (Retireable) existing;
-            retireable.setRetired(true);
-            retireable.setDateRetired(new Date());
-            retireable.setRetireReason("metadata deploy");
-            retireable.setRetiredBy(Context.getAuthenticatedUser());
-        }
-        else {
-            throw new IllegalStateException(existing.getClass().getName() + " is not Voidable or Retirable");
-        }
-    }
-
 
     /**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)

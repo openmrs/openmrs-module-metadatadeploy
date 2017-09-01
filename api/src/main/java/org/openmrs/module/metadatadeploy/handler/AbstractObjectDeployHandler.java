@@ -15,7 +15,13 @@
 package org.openmrs.module.metadatadeploy.handler;
 
 import org.openmrs.OpenmrsObject;
+import org.openmrs.Retireable;
+import org.openmrs.Voidable;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.ObjectUtils;
+
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * Abstract base class for object deploy handlers
@@ -57,4 +63,35 @@ public abstract class AbstractObjectDeployHandler<T extends OpenmrsObject> imple
 			existing.setId(existingId);
 		}
 	}
+
+	protected <T extends OpenmrsObject> T findExisting(Collection<T> collection, T incomingItem) {
+		for (T candidate : collection) {
+			if (candidate.getUuid().equals(incomingItem.getUuid())) {
+				return candidate;
+			}
+		}
+		return null;
+	}
+
+	protected void voidOrRetire(OpenmrsObject existing) {
+		if (existing instanceof Voidable) {
+			Voidable voidable = (Voidable) existing;
+			voidable.setVoided(true);
+			voidable.setDateVoided(new Date());
+			voidable.setVoidReason("metadata deploy");
+			voidable.setVoidedBy(Context.getAuthenticatedUser());
+		}
+		else if (existing instanceof Retireable) {
+			Retireable retireable = (Retireable) existing;
+			retireable.setRetired(true);
+			retireable.setDateRetired(new Date());
+			retireable.setRetireReason("metadata deploy");
+			retireable.setRetiredBy(Context.getAuthenticatedUser());
+		}
+		else {
+			throw new IllegalStateException(existing.getClass().getName() + " is not Voidable or Retirable");
+		}
+	}
+
+
 }

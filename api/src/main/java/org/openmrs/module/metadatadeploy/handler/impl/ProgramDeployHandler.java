@@ -14,17 +14,26 @@
 
 package org.openmrs.module.metadatadeploy.handler.impl;
 
+import org.openmrs.OpenmrsObject;
 import org.openmrs.Program;
 import org.openmrs.ProgramWorkflow;
 import org.openmrs.ProgramWorkflowState;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.metadatadeploy.ObjectUtils;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Deployment handler for programs
@@ -35,6 +44,22 @@ public class ProgramDeployHandler extends AbstractObjectDeployHandler<Program> {
 	@Autowired
 	@Qualifier("programWorkflowService")
 	private ProgramWorkflowService programService;
+
+	private Map<Class, Set<String>> excludeFields;
+
+	public ProgramDeployHandler() {
+		super();
+		excludeFields = new HashMap<Class, Set<String>>();
+		excludeFields.put(Program.class, new HashSet<String>(Arrays.asList(
+				"programId", "allWorkflows", "descriptions", "conceptMappings"
+		)));
+		excludeFields.put(ProgramWorkflow.class, new HashSet<String>(Arrays.asList(
+				"programWorkflowId", "program", "states"
+		)));
+		excludeFields.put(ProgramWorkflowState.class, new HashSet<String>(Arrays.asList(
+				"programWorkflowStateId", "programWorkflow"
+		)));
+	}
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
@@ -87,4 +112,46 @@ public class ProgramDeployHandler extends AbstractObjectDeployHandler<Program> {
 
 		programService.saveProgram(obj);
 	}
+
+	@Override
+	public void overwrite(Program incoming, Program existing) {
+		ObjectUtils.overwrite(incoming, existing, excludeFields.get(Program.class));
+		mergeCollection(existing.getAllWorkflows(), incoming.getAllWorkflows(), excludeFields.get(ProgramWorkflow.class));
+	}
+
+	private <T extends OpenmrsObject> void mergeCollection(Collection<T> existing, Collection<T> incoming, Set<String> fieldsToExclude) {
+
+		Set<T> handled = new HashSet<T>();
+		Set<T> incomingToAdd = new HashSet<T>();
+		for (T incomingItem : incoming) {
+			T existingItem = findExisting(existing, incomingItem);
+			if (existingItem == null) {
+				incomingToAdd.add(incomingItem);
+			} else {
+				ObjectUtils.overwrite(incomingItem, existingItem, fieldsToExclude);
+				if (incomingItem instanceof ProgramWorkflow) {
+					mergeCollection(((ProgramWorkflow) existingItem).getStates(), ((ProgramWorkflow) incomingItem).getStates(), excludeFields.get(ProgramWorkflowState.class));
+				}
+
+				handled.add(existingItem);
+			}
+		}
+
+		for (Iterator<T> iter = existing.iterator(); iter.hasNext(); ) {
+			T existingItem = iter.next();
+			if (!handled.contains(existingItem)) {
+				if (existingItem instanceof ProgramWorkflow) {
+					for (ProgramWorkflowState state : ((ProgramWorkflow) existingItem).getStates()) {
+						voidOrRetire(state);
+					}
+				}
+				voidOrRetire(existingItem);
+			}
+		}
+
+		for (T incomingItem : incomingToAdd) {
+			existing.add(incomingItem);
+		}
+	}
+
 }
