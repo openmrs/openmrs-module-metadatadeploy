@@ -16,6 +16,9 @@ package org.openmrs.module.metadatadeploy.descriptor;
 
 import org.openmrs.Program;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Encapsulates the information needed to create a new Program
  */
@@ -31,6 +34,10 @@ public abstract class ProgramDescriptor extends MetadataDescriptor<Program> {
      */
     public String outcomesConceptUuid() {
         return null;
+    }
+
+    public Set<ProgramWorkflowDescriptor> workflows() {
+        return new HashSet<ProgramWorkflowDescriptor>();
     }
 
     /**

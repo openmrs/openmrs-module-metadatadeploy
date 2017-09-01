@@ -34,6 +34,8 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Privilege;
 import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
 import org.openmrs.ProviderAttributeType;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
@@ -430,8 +432,49 @@ public class CoreConstructors {
 		return obj;
 	}
 
+	public static Program program(String name, String description, String conceptUuid, String outcomesConceptUuid, String uuid, Set<ProgramWorkflow> workflows) {
+		Program obj = new Program();
+		obj.setName(name);
+		obj.setDescription(description);
+		obj.setConcept(MetadataUtils.existing(Concept.class, conceptUuid));
+		obj.setUuid(uuid);
+
+		if (StringUtils.isNotEmpty(outcomesConceptUuid)) {
+			obj.setOutcomesConcept(MetadataUtils.existing(Concept.class, outcomesConceptUuid));
+		}
+
+		if (workflows != null && workflows.size() > 0) {
+			obj.setAllWorkflows(workflows);
+		}
+
+		return obj;
+	}
+
+
 	public static Program program(String name, String description, String conceptUuid, String uuid) {
 	 	return CoreConstructors.program(name, description, conceptUuid, null, uuid);
+	}
+
+	public static ProgramWorkflow programWorkflow(String conceptUuid, String uuid, Set<ProgramWorkflowState> states) {
+		ProgramWorkflow obj = new ProgramWorkflow();
+		obj.setConcept(MetadataUtils.existing(Concept.class, conceptUuid));
+		obj.setUuid(uuid);
+
+		if (states != null && states.size() > 0) {
+			obj.setStates(states);
+		}
+
+		return obj;
+	}
+
+	public static ProgramWorkflowState programWorkflowState(String conceptUuid, Boolean initial, Boolean terminal, String uuid) {
+		ProgramWorkflowState obj = new ProgramWorkflowState();
+		obj.setConcept(MetadataUtils.existing(Concept.class, conceptUuid));
+		obj.setInitial(initial);
+		obj.setTerminal(terminal);
+		obj.setUuid(uuid);
+
+		return obj;
 	}
 
 

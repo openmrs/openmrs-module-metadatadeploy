@@ -21,6 +21,8 @@ import org.openmrs.LocationAttributeType;
 import org.openmrs.OpenmrsMetadata;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Privilege;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
 import org.openmrs.Role;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -36,6 +38,8 @@ import org.openmrs.module.metadatadeploy.descriptor.PatientIdentifierTypeDescrip
 import org.openmrs.module.metadatadeploy.descriptor.PersonAttributeTypeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.PrivilegeDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.ProgramDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.ProgramWorkflowDescriptor;
+import org.openmrs.module.metadatadeploy.descriptor.ProgramWorkflowStateDescriptor;
 import org.openmrs.module.metadatadeploy.descriptor.RoleDescriptor;
 import org.openmrs.module.metadatadeploy.source.ObjectSource;
 import org.openmrs.module.metadatadeploy.sync.MetadataSynchronizationRunner;
@@ -59,6 +63,7 @@ import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounte
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.location;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.locationAttribute;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.packageFile;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.programWorkflowState;
 
 /**
  * Abstract base class for metadata bundle components
@@ -291,7 +296,33 @@ public abstract class AbstractMetadataBundle implements MetadataBundle {
 	 * Utility method to install a program metadata in an openmrs insatnce
 	 * @param d
      */
-	protected void install(ProgramDescriptor d){
-		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.outcomesConceptUuid(), d.uuid()));
+	protected void install(ProgramDescriptor d) {
+
+		// create any workflows and states
+
+		Set<ProgramWorkflow> workflows = new HashSet<ProgramWorkflow>();;
+
+		if (d.workflows() != null && d.workflows().size() > 0) {
+
+			for (ProgramWorkflowDescriptor workflow : d.workflows()) {
+
+				Set<ProgramWorkflowState> states = new HashSet<ProgramWorkflowState>();
+
+				if (workflow.states() != null && workflow.states().size() > 0) {
+
+					for (ProgramWorkflowStateDescriptor state : workflow.states()) {
+						states.add(programWorkflowState(state.conceptUuid(), state.initial(), state.terminal(), state.uuid()));
+					}
+				}
+
+				workflows.add(CoreConstructors.programWorkflow(workflow.conceptUuid(), workflow.uuid(), states));
+			}
+		}
+
+
+		// then install the program
+		install(CoreConstructors.program(d.name(), d.description(), d.conceptUuid(), d.outcomesConceptUuid(), d.uuid(), workflows));
+
+
 	}
 }
