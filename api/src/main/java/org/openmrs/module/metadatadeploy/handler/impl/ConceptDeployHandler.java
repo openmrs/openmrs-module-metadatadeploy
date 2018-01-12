@@ -25,6 +25,7 @@ import org.openmrs.OpenmrsObject;
 import org.openmrs.Retireable;
 import org.openmrs.Voidable;
 import org.openmrs.annotation.Handler;
+import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.ObjectUtils;
@@ -32,6 +33,7 @@ import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -105,7 +107,7 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
     @Override
     public void overwrite(Concept incoming, Concept existing) {
         ObjectUtils.overwrite(incoming, existing, excludeFields.get(Concept.class));
-        mergeCollection(existing.getNames(true), incoming.getNames(true), excludeFields.get(ConceptName.class));
+        mergeCollection(getConceptNamesCollection(existing), getConceptNamesCollection(incoming), excludeFields.get(ConceptName.class));
         mergeCollection(existing.getDescriptions(), incoming.getDescriptions(), excludeFields.get(ConceptDescription.class));
         mergeCollection(existing.getConceptMappings(), incoming.getConceptMappings(), excludeFields.get(ConceptMap.class));
     }
@@ -165,6 +167,29 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
             existing.add(incomingItem);
         }
     }
+
+    /**
+     * OpenMRS doesn't allow direct access to concept.names, this hacks around it
+     * @param concept
+     * @return
+     */
+    private Collection<ConceptName>  getConceptNamesCollection(Concept concept) {
+        try {
+            Field names = Concept.class.getDeclaredField("names");
+            boolean previousFieldAccessibility = names.isAccessible();
+            names.setAccessible(true);
+            Collection<ConceptName> childCollection = (Collection<ConceptName>) names.get(concept);
+            names.setAccessible(previousFieldAccessibility);
+            return childCollection;
+        }
+        catch (NoSuchFieldException e) {
+            throw new APIException("unaccessible getter method for concept.names");
+        }
+        catch (IllegalAccessException e) {
+            throw new APIException("unaccessible getter method for concept.names");
+        }
+    }
+
 
     /**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
