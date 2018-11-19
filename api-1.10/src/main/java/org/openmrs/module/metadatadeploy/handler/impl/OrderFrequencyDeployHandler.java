@@ -23,8 +23,12 @@ public class OrderFrequencyDeployHandler extends AbstractObjectDeployHandler<Ord
 
     @Override
     public OrderFrequency save(OrderFrequency obj) {
-        return orderService.saveOrderFrequency(obj);
-    }
+    	OrderFrequency existing = fetch(obj.getUuid());
+		if (existing == null) {
+			return orderService.saveOrderFrequency(obj);
+		}
+		return obj;
+	}
 
     @Override
     public void uninstall(OrderFrequency obj, String reason) {
