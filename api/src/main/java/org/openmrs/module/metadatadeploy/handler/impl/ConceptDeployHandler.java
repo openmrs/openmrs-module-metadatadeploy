@@ -82,7 +82,12 @@ public class ConceptDeployHandler extends AbstractObjectDeployHandler<Concept> {
 
         // the core API doesn't always return ConceptNumeric for numeric concepts
         if (concept != null && concept.getDatatype().isNumeric() && !(concept instanceof ConceptNumeric)) {
-            concept = Context.getConceptService().getConceptNumeric(concept.getId());
+            ConceptNumeric conceptNumeric = Context.getConceptService().getConceptNumeric(concept.getId());
+            // If this was previously saved as a Concept, but is now being saved as a ConceptNumeric, allow for this
+            if (conceptNumeric == null) {
+                conceptNumeric = new ConceptNumeric(concept);
+            }
+            concept = conceptNumeric;
         }
 
         return concept;
