@@ -79,14 +79,14 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	 * 
 	 * @return the current hibernate session.
 	 */
-	private org.openmrs.api.db.hibernate.DbSession getCurrentSession() {
+	private  org.openmrs.api.db.hibernate.DbSession getCurrentSession() {
 		try {
 			return sessionFactory.getCurrentSession();
 		}
 		catch (NoSuchMethodError ex) {
 			try {
 				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.openmrs.api.db.hibernate.DbSession)method.invoke(sessionFactory, null);
+				return ( org.openmrs.api.db.hibernate.DbSession)method.invoke(sessionFactory, null);
 			}
 			catch (Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);
