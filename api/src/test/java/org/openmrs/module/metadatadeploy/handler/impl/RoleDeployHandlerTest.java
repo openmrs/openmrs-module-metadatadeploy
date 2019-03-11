@@ -15,12 +15,14 @@
 package org.openmrs.module.metadatadeploy.handler.impl;
 
 import org.hibernate.FlushMode;
+
 import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -45,7 +47,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	private MetadataDeployService deployService;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 
 	/**
 	 * Tests use of handler for installation
@@ -152,14 +154,14 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	 * 
 	 * @return the current hibernate session.
 	 */
-	private org.hibernate.Session getCurrentSession() {
+	private org.openmrs.api.db.hibernate.DbSession getCurrentSession() {
 		try {
 			return sessionFactory.getCurrentSession();
 		}
 		catch (NoSuchMethodError ex) {
 			try {
 				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
+				return (org.openmrs.api.db.hibernate.DbSession)method.invoke(sessionFactory, null);
 			}
 			catch (Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);

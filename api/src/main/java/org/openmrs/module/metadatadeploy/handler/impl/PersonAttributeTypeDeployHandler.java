@@ -15,11 +15,10 @@
 package org.openmrs.module.metadatadeploy.handler.impl;
 
 import java.lang.reflect.Method;
-
-import org.hibernate.SessionFactory;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +34,7 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	private PersonService personService;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
@@ -80,14 +79,14 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	 * 
 	 * @return the current hibernate session.
 	 */
-	private org.hibernate.Session getCurrentSession() {
+	private org.openmrs.api.db.hibernate.DbSession getCurrentSession() {
 		try {
 			return sessionFactory.getCurrentSession();
 		}
 		catch (NoSuchMethodError ex) {
 			try {
 				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
+				return (org.openmrs.api.db.hibernate.DbSession)method.invoke(sessionFactory, null);
 			}
 			catch (Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);
