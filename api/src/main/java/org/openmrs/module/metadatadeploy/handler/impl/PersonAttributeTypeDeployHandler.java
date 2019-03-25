@@ -15,11 +15,10 @@
 package org.openmrs.module.metadatadeploy.handler.impl;
 
 import java.lang.reflect.Method;
-
-import org.hibernate.SessionFactory;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.metadatadeploy.handler.AbstractObjectDeployHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +34,7 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	private PersonService personService;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 
 	/**
 	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#fetch(String)
@@ -50,12 +49,14 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	 */
 	@Override
 	public PersonAttributeType save(PersonAttributeType obj) {
-		// The regular save method in the person service does some interesting stuff to check name changes.. which breaks
-		// our way of replacing existing objects. Our workaround is to ask Hibernate directly to save the object
+		// The regular save method in the person service does some interesting stuff to
+		// check name changes.. which breaks
+		// our way of replacing existing objects. Our workaround is to ask Hibernate
+		// directly to save the object
 		getCurrentSession().saveOrUpdate(obj);
 		return obj;
 
-		//return personService.savePersonAttributeType(obj);
+		// return personService.savePersonAttributeType(obj);
 	}
 
 	/**
@@ -67,29 +68,30 @@ public class PersonAttributeTypeDeployHandler extends AbstractObjectDeployHandle
 	}
 
 	/**
-	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject, String)
-	 * @param obj the object to uninstall
+	 * @see org.openmrs.module.metadatadeploy.handler.ObjectDeployHandler#uninstall(org.openmrs.OpenmrsObject,
+	 *      String)
+	 * @param obj
+	 *            the object to uninstall
 	 */
 	@Override
 	public void uninstall(PersonAttributeType obj, String reason) {
 		personService.retirePersonAttributeType(obj, reason);
 	}
-	
+
 	/**
-	 * Gets the current hibernate session while taking care of the hibernate 3 and 4 differences.
+	 * Gets the current hibernate session while taking care of the hibernate 3 and 4
+	 * differences.
 	 * 
 	 * @return the current hibernate session.
 	 */
-	private org.hibernate.Session getCurrentSession() {
+	private org.openmrs.api.db.hibernate.DbSession getCurrentSession() {
 		try {
 			return sessionFactory.getCurrentSession();
-		}
-		catch (NoSuchMethodError ex) {
+		} catch (NoSuchMethodError ex) {
 			try {
 				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
-			}
-			catch (Exception e) {
+				return (org.openmrs.api.db.hibernate.DbSession) method.invoke(sessionFactory, null);
+			} catch (Exception e) {
 				throw new RuntimeException("Failed to get the current hibernate session", e);
 			}
 		}
