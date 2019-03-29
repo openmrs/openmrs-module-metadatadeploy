@@ -15,12 +15,12 @@
 package org.openmrs.module.metadatadeploy.handler.impl;
 
 import org.hibernate.FlushMode;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.metadatadeploy.api.MetadataDeployService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -45,7 +45,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	private MetadataDeployService deployService;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 
 	/**
 	 * Tests use of handler for installation
@@ -106,7 +106,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void integration_shouldWorkWithoutFlushes() {
-		getCurrentSession().setFlushMode(FlushMode.MANUAL);
+		sessionFactory.getCurrentSession().setFlushMode(FlushMode.MANUAL);
 
 		deployService.installObject(privilege("Privilege1", "Testing"));
 		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
@@ -117,7 +117,7 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 		deployService.installObject(role("Role1", "Testing", null, idSet("Privilege1")));
 
 		Context.flushSession();
-		getCurrentSession().setFlushMode(FlushMode.AUTO);
+		sessionFactory.getCurrentSession().setFlushMode(FlushMode.AUTO);
 	}
 
 	/**
@@ -152,18 +152,5 @@ public class RoleDeployHandlerTest extends BaseModuleContextSensitiveTest {
 	 * 
 	 * @return the current hibernate session.
 	 */
-	private org.hibernate.Session getCurrentSession() {
-		try {
-			return sessionFactory.getCurrentSession();
-		}
-		catch (NoSuchMethodError ex) {
-			try {
-				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
-				return (org.hibernate.Session)method.invoke(sessionFactory, null);
-			}
-			catch (Exception e) {
-				throw new RuntimeException("Failed to get the current hibernate session", e);
-			}
-		}
-	}
+
 }
