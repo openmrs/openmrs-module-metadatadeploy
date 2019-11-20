@@ -189,7 +189,7 @@ public class MetadataUtilsTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void getLocation_shouldFetchByUuid() {
 		Location unknown = Context.getLocationService().getLocation(1);
-		Assert.assertThat(MetadataUtils.getLocation("dc5c1fcc-0459-4201-bf70-0b90535ba362"), is(unknown));
+		Assert.assertThat(MetadataUtils.getLocation("8d6c993e-c2cc-11de-8d13-0010c6dffd0f"), is(unknown));
 	}
 
 	/**
