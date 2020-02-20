@@ -40,8 +40,8 @@
 	</modules>
 	
 	<properties>
-		<openMRSVersion>1.9.4</openMRSVersion>
-		<openMRSBuildVersion>1.9.4</openMRSBuildVersion>
+		<openMRSVersion>1.9.9</openMRSVersion>
+		<openMRSBuildVersion>1.9.9</openMRSBuildVersion>
 
 		<!-- Module dependencies -->
 		<metadatasharingVersion>1.1.8</metadatasharingVersion>
