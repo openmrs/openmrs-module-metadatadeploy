@@ -25,7 +25,7 @@
 		<property name="moduleService">
 			<list>
 				<value>org.openmrs.module.metadatadeploy.api.MetadataDeployService</value>
-				<ref local="metadataDeployService"/>
+				<ref bean="metadataDeployService"/>
 			</list>
 		</property>
 	</bean>
