@@ -9,6 +9,8 @@ import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.api.ConceptNameType;
 
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 public class ConceptNumericBuilder extends ConceptBuilder {
@@ -95,7 +97,16 @@ public class ConceptNumericBuilder extends ConceptBuilder {
     }
 
     public ConceptNumericBuilder precise(Boolean precise) {
-        ((ConceptNumeric) entity).setPrecise(precise);        
+    	try {
+    		((ConceptNumeric) entity).setPrecise(precise);
+    	}
+        catch(NoSuchMethodError ex) {
+			try {
+				Method method = ((ConceptNumeric) entity).getClass().getMethod("setAllowDecimal", new Class[] { Boolean.class });
+				method.invoke(((ConceptNumeric) entity), precise);
+			}
+			catch (Exception e) {e.printStackTrace();}
+		}
         return this;
     }
 
