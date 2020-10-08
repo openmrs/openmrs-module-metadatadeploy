@@ -3,6 +3,7 @@
 .classpath
 api/target
 api-1.10/target
+api-1.11/target
 omod/target
 test/target
 .idea
